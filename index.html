@@ -17,7 +17,17 @@
             min-height: 100vh;
             text-align: center;
         }
+        .container { max-width: 480px; margin: 0 auto; }
         h1 { font-size: 2.4rem; margin: 40px 0 30px; }
+        
+        .question {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+        .active { 
+            display: block !important; 
+        }
+        
         button, .option {
             background: rgba(255,255,255,0.15);
             color: white;
@@ -28,20 +38,28 @@
             font-size: 1.3rem;
             width: 85%;
         }
-        input { width: 85%; padding: 18px; font-size: 1.2rem; border-radius: 20px; border: none; margin: 20px 0; }
+        input {
+            width: 85%;
+            padding: 18px;
+            font-size: 1.2rem;
+            border-radius: 20px;
+            border: none;
+            margin: 20px 0;
+        }
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(20px);} to {opacity: 1; transform: translateY(0);} }
     </style>
 </head>
 <body>
     <div class="container">
 
-        <!-- سوال اول -->
+        <!-- سوال ۱ -->
         <div id="q1" class="question active">
             <h1>امروز چطوری؟</h1>
             <button onclick="handleFirstAnswer('خوبم')">خوبم 😊</button>
             <button onclick="handleFirstAnswer('خوب نیستم')">خوب نیستم 😔</button>
         </div>
 
-        <!-- اگر خوب نبود -->
+        <!-- دلیل ناراحتی -->
         <div id="reason" class="question">
             <h1>چرا خوب نیستی؟</h1>
             <input type="text" id="reasonInput" placeholder="دلیلش رو بنویس...">
@@ -62,15 +80,10 @@
             <button onclick="tg.close()">نه، فعلاً بسشه</button>
         </div>
 
-        <!-- سوالات بعدی (بعداً پر می‌کنیم) -->
+        <!-- سوال دوم (بعداً بیشتر اضافه می‌کنیم) -->
         <div id="q2" class="question">
-            <h1>سوال دوم (بعداً طراحی می‌کنیم)</h1>
-            <button onclick="nextQuestion()">بعدی</button>
-        </div>
-
-        <div id="finish" class="question">
-            <h1>تموم شد! 🎉</h1>
-            <button onclick="finishTest()">ارسال به امیررضا</button>
+            <h1>سوال دوم رو بعداً طراحی می‌کنیم</h1>
+            <button onclick="finishTest()">پایان تست و ارسال</button>
         </div>
     </div>
 
@@ -80,9 +93,15 @@
 
         let answers = {};
 
+        function hideAll() {
+            document.querySelectorAll('.question').forEach(q => {
+                q.classList.remove('active');
+            });
+        }
+
         function handleFirstAnswer(answer) {
+            hideAll();
             answers.q1 = answer;
-            document.getElementById('q1').classList.remove('active');
 
             if (answer === 'خوبم') {
                 alert("عالیه! خیلی خوشحالم که خوبی 😊");
@@ -95,31 +114,25 @@
         function submitReason() {
             const reason = document.getElementById('reasonInput').value.trim() || "نداد";
             answers.reason = reason;
+            hideAll();
 
-            document.getElementById('reason').classList.remove('active');
-            document.getElementById('empathyText').innerHTML = `ای وای خیلی ناراحتم بخاطر <br><b>${reason}</b>`;
+            document.getElementById('empathyText').innerHTML = `ای وای خیلی ناراحتم بخاطر<br><b>${reason}</b>`;
             document.getElementById('empathy').classList.add('active');
         }
 
         function askContinue() {
-            document.getElementById('empathy').classList.remove('active');
+            hideAll();
             document.getElementById('continueAsk').classList.add('active');
         }
 
         function startQuestions() {
-            document.getElementById('continueAsk').classList.remove('active');
+            hideAll();
             document.getElementById('q2').classList.add('active');
-        }
-
-        function nextQuestion() {
-            // بعداً سوالات بیشتر اضافه می‌کنیم
-            document.getElementById('q2').classList.remove('active');
-            document.getElementById('finish').classList.add('active');
         }
 
         function finishTest() {
             let result = `📋 تست جدید:\n\n`;
-            result += `۱. چطوری؟ → ${answers.q1}\n`;
+            result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
             if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
 
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
@@ -131,7 +144,7 @@
                 body: JSON.stringify({ chat_id: chatId, text: result })
             });
 
-            alert("✅ جواب‌ها ارسال شد!");
+            alert("✅ جواب‌ها با موفقیت ارسال شد!");
             tg.close();
         }
     </script>
