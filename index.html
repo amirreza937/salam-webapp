@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلام!</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin: 0;
+            padding: 40px 20px;
+            height: 100vh;
+        }
+        h1 { font-size: 3rem; margin: 40px 0 30px; }
+        input {
+            width: 90%;
+            padding: 18px;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        button {
+            background: #229ED9;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="hello">
+        <h1>سلام 👋</h1>
+    </div>
+
+    <div id="question" style="display:none;">
+        <h1>چطوری؟</h1>
+        <input type="text" id="answerInput" placeholder="جوابت رو بنویس...">
+        <br><br>
+        <button onclick="sendData()">ارسال به امیررضا</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        setTimeout(() => {
+            document.getElementById('hello').style.display = 'none';
+            document.getElementById('question').style.display = 'block';
+            document.getElementById('answerInput').focus();
+        }, 1400);
+
+        function sendData() {
+            let answer = document.getElementById('answerInput').value.trim();
+            
+            let msg = answer.includes("خوب") ? "عالیه! 😊 خوشحالم که خوبی." :
+                      (answer.includes("بد") || answer.includes("نیستم")) ? "😔 چرا؟ اگه خواستی بگو برات گوش می‌کنم." : "فهمیدم 😌";
+
+            let finalText = `سلام، جوابش این بود:\n\n${answer}\n\n${msg}`;
+
+            tg.sendData(finalText);
+            alert("ارسال شد ✅");
+            tg.close();
+        }
+    </script>
+</body>
+</html>
