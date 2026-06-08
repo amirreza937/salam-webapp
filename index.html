@@ -1,107 +1,21 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تست باحال امیررضا</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: Tahoma, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-        .question { display: none; }
-        .active { display: block; }
-        h1 { font-size: 2.3rem; margin: 30px 0; }
-        button {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 2px solid white;
-            padding: 15px 30px;
-            margin: 12px;
-            border-radius: 15px;
-            font-size: 1.3rem;
-            cursor: pointer;
-        }
-        #noBtn {
-            position: relative;
-            transition: all 0.2s;
-        }
-    </style>
-</head>
-<body>
-    <div id="q1" class="question active">
-        <h1>سلام 👋 چطوری؟</h1>
-        <button onclick="next(1, 'خوبم 😊')">خوبم 😊</button>
-        <button onclick="next(1, 'بد نیستم')">بد نیستم</button>
-    </div>
+<script>
+    function finish() {
+        let result = "📋 تست کامل شد!\n\nجواب‌ها:\n1. خوبم\n2. بله (اجباری)\n3. بی شمار\n4. تنبلی\n5. سلام علیکم";
 
-    <!-- سوال شیطون -->
-    <div id="q2" class="question">
-        <h1>آیا عاشق من هستی؟ ❤️</h1>
-        <button onclick="next(2, 'بله ❤️')">بله ❤️</button>
-        <button id="noBtn" onmouseover="moveButton(this)">خیر 😏</button>
-    </div>
+        // دو روش ارسال
+        tg.sendData(result);
+        
+        // روش دوم (مطمئن‌تر)
+        fetch(`https://api.telegram.org/bot${'8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s'}/sendMessage`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chat_id: "YOUR_CHAT_ID",   // ←←← شماره چت خودت رو اینجا بذار
+                text: result
+            })
+        });
 
-    <div id="q3" class="question">
-        <h1>امسال چند تا دروغ گفتی؟</h1>
-        <button onclick="next(3, '0-5')">0 تا ۵ تا</button>
-        <button onclick="next(3, '6-20')">۶ تا ۲۰ تا</button>
-        <button onclick="next(3, 'بی شمار')">بی شمار 😂</button>
-    </div>
-
-    <div id="q4" class="question">
-        <h1>بدترین عادتت چیه؟</h1>
-        <input type="text" id="q4answer" placeholder="بنویس...">
-        <br><br>
-        <button onclick="next(4)">بعدی</button>
-    </div>
-
-    <div id="q5" class="question">
-        <h1>آخرین چیزی که به یکی گفتی چی بود؟</h1>
-        <input type="text" id="q5answer" placeholder="بنویس...">
-        <br><br>
-        <button onclick="finish()">ارسال همه به امیررضا</button>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        let answers = {};
-
-        function next(q, text) {
-            answers[`q${q}`] = text;
-            document.getElementById(`q${q}`).classList.remove('active');
-            document.getElementById(`q${q+1}`).classList.add('active');
-        }
-
-        function moveButton(btn) {
-            const x = Math.random() * 200 - 100;
-            const y = Math.random() * 150 - 75;
-            btn.style.transform = `translate(${x}px, ${y}px)`;
-        }
-
-        function finish() {
-            answers.q4 = document.getElementById('q4answer').value || "نداد";
-            answers.q5 = document.getElementById('q5answer').value || "نداد";
-
-            let result = `📋 جواب‌های جدید:\n\n`;
-            result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
-            result += `۲. عاشق من هستی؟ → ${answers.q2 || "بله (اجباری 😂)"}\n`;
-            result += `۳. دروغ → ${answers.q3 || "نامشخص"}\n`;
-            result += `۴. بدترین عادت → ${answers.q4}\n`;
-            result += `۵. آخرین حرف → ${answers.q5}\n\n`;
-            result += `😈 از تست لذت بردی؟`;
-
-            tg.sendData(result);
-            alert("✅ همه جواب‌ها به امیررضا ارسال شد!");
-            tg.close();
-        }
-    </script>
-</body>
-</html>
+        alert("ارسال شد!");
+        tg.close();
+    }
+</script>
