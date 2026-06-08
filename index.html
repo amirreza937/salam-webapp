@@ -16,84 +16,61 @@
             padding: 20px;
             min-height: 100vh;
             text-align: center;
-            overflow-x: hidden;
         }
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            animation: fadeIn 0.8s ease;
-        }
-        h1 {
-            font-size: 2.4rem;
-            margin: 40px 0 30px;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .question {
-            display: none;
-            animation: slideUp 0.6s ease forwards;
-        }
-        .active { display: block; }
-        
+        h1 { font-size: 2.4rem; margin: 40px 0 30px; }
         button, .option {
             background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
             color: white;
             border: 2px solid rgba(255,255,255,0.4);
             padding: 16px 28px;
             margin: 12px;
             border-radius: 20px;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             width: 85%;
-            transition: all 0.3s;
         }
-        button:hover, .option:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.05);
-        }
-        #noBtn {
-            position: relative;
-            transition: all 0.15s ease;
-        }
-        input {
-            width: 85%;
-            padding: 18px;
-            font-size: 1.2rem;
-            border-radius: 20px;
-            border: none;
-            margin: 25px 0;
-            text-align: center;
-        }
-        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
-        @keyframes slideUp { from {transform: translateY(30px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        input { width: 85%; padding: 18px; font-size: 1.2rem; border-radius: 20px; border: none; margin: 20px 0; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- سوال ۱ -->
+
+        <!-- سوال اول -->
         <div id="q1" class="question active">
-            <h1>سلام! 👋<br>امروز چطوری؟</h1>
-            <button onclick="next(1, 'عالی‌ام 🔥')">عالی‌ام 🔥</button>
-            <button onclick="next(1, 'خوبم')">خوبم</button>
-            <button onclick="next(1, 'م ordinary')">م ordinary</button>
+            <h1>امروز چطوری؟</h1>
+            <button onclick="handleFirstAnswer('خوبم')">خوبم 😊</button>
+            <button onclick="handleFirstAnswer('خوب نیستم')">خوب نیستم 😔</button>
         </div>
 
-        <!-- سوال شیطون ۲ -->
+        <!-- اگر خوب نبود -->
+        <div id="reason" class="question">
+            <h1>چرا خوب نیستی؟</h1>
+            <input type="text" id="reasonInput" placeholder="دلیلش رو بنویس...">
+            <br><br>
+            <button onclick="submitReason()">ارسال دلیل</button>
+        </div>
+
+        <!-- پیام همدردی -->
+        <div id="empathy" class="question">
+            <h1 id="empathyText"></h1>
+            <button onclick="askContinue()">ادامه بدم؟</button>
+        </div>
+
+        <!-- ادامه یا خروج -->
+        <div id="continueAsk" class="question">
+            <h1>می‌خوای ادامه بدیم؟</h1>
+            <button onclick="startQuestions()">آره، ادامه بده</button>
+            <button onclick="tg.close()">نه، فعلاً بسشه</button>
+        </div>
+
+        <!-- سوالات بعدی (بعداً پر می‌کنیم) -->
         <div id="q2" class="question">
-            <h1>راستشو بگو...<br>عاشق من هستی؟ ❤️</h1>
-            <button onclick="next(2, 'بله خیلی ❤️')">بله خیلی ❤️</button>
-            <button id="noBtn" onmouseover="moveNoButton(this)">خیر 😌</button>
-        </div>
-
-        <!-- سوال‌های بعدی رو بعداً اضافه می‌کنیم -->
-        <div id="q3" class="question">
-            <h1>سوال ۳ (بعداً عوض می‌کنیم)</h1>
-            <button onclick="next(3, 'گزینه ۱')">گزینه ۱</button>
-            <button onclick="next(3, 'گزینه ۲')">گزینه ۲</button>
+            <h1>سوال دوم (بعداً طراحی می‌کنیم)</h1>
+            <button onclick="nextQuestion()">بعدی</button>
         </div>
 
         <div id="finish" class="question">
             <h1>تموم شد! 🎉</h1>
-            <button onclick="finishTest()">ارسال جواب‌ها به امیررضا</button>
+            <button onclick="finishTest()">ارسال به امیررضا</button>
         </div>
     </div>
 
@@ -103,25 +80,47 @@
 
         let answers = {};
 
-        function next(q, text) {
-            answers[`q${q}`] = text;
-            document.getElementById(`q${q}`).classList.remove('active');
-            const nextQ = document.getElementById(`q${q+1}`);
-            if (nextQ) nextQ.classList.add('active');
-            else document.getElementById('finish').classList.add('active');
+        function handleFirstAnswer(answer) {
+            answers.q1 = answer;
+            document.getElementById('q1').classList.remove('active');
+
+            if (answer === 'خوبم') {
+                alert("عالیه! خیلی خوشحالم که خوبی 😊");
+                document.getElementById('q2').classList.add('active');
+            } else {
+                document.getElementById('reason').classList.add('active');
+            }
         }
 
-        function moveNoButton(btn) {
-            const x = Math.random() * 280 - 140;
-            const y = Math.random() * 200 - 100;
-            btn.style.transform = `translate(${x}px, ${y}px)`;
+        function submitReason() {
+            const reason = document.getElementById('reasonInput').value.trim() || "نداد";
+            answers.reason = reason;
+
+            document.getElementById('reason').classList.remove('active');
+            document.getElementById('empathyText').innerHTML = `ای وای خیلی ناراحتم بخاطر <br><b>${reason}</b>`;
+            document.getElementById('empathy').classList.add('active');
+        }
+
+        function askContinue() {
+            document.getElementById('empathy').classList.remove('active');
+            document.getElementById('continueAsk').classList.add('active');
+        }
+
+        function startQuestions() {
+            document.getElementById('continueAsk').classList.remove('active');
+            document.getElementById('q2').classList.add('active');
+        }
+
+        function nextQuestion() {
+            // بعداً سوالات بیشتر اضافه می‌کنیم
+            document.getElementById('q2').classList.remove('active');
+            document.getElementById('finish').classList.add('active');
         }
 
         function finishTest() {
-            let result = `📋 تست جدید از یک نفر:\n\n`;
-            Object.keys(answers).forEach(key => {
-                result += `${key}: ${answers[key]}\n`;
-            });
+            let result = `📋 تست جدید:\n\n`;
+            result += `۱. چطوری؟ → ${answers.q1}\n`;
+            if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
 
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
@@ -132,7 +131,7 @@
                 body: JSON.stringify({ chat_id: chatId, text: result })
             });
 
-            alert("✅ همه جواب‌ها با موفقیت ارسال شد!");
+            alert("✅ جواب‌ها ارسال شد!");
             tg.close();
         }
     </script>
