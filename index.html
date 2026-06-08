@@ -3,70 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سلام!</title>
+    <title>تست باحال امیررضا</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
-            text-align: center;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             margin: 0;
-            padding: 40px 20px;
-            height: 100vh;
+            padding: 20px;
+            text-align: center;
         }
-        h1 { font-size: 3rem; margin: 40px 0 30px; }
-        input {
-            width: 90%;
-            padding: 18px;
-            font-size: 1.4rem;
-            border: none;
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-        button {
-            background: #229ED9;
+        .question { display: none; }
+        .active { display: block; }
+        h1 { font-size: 2.2rem; margin: 30px 0; }
+        button, .option {
+            background: rgba(255,255,255,0.2);
             color: white;
-            padding: 18px 50px;
-            font-size: 1.5rem;
-            border: none;
+            border: 2px solid white;
+            padding: 15px 25px;
+            margin: 10px;
             border-radius: 15px;
+            font-size: 1.2rem;
             cursor: pointer;
+        }
+        input[type="text"] {
+            width: 85%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border-radius: 15px;
+            border: none;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
-    <div id="hello">
-        <h1>سلام 👋</h1>
+    <div id="q1" class="question active">
+        <h1>سلام 👋 چطوری؟</h1>
+        <button onclick="next(1)">خوبم 😊</button>
+        <button onclick="next(1)">بد نیستم</button>
     </div>
 
-    <div id="question" style="display:none;">
-        <h1>چطوری؟</h1>
-        <input type="text" id="answerInput" placeholder="جوابت رو بنویس...">
+    <!-- سوال شیطون -->
+    <div id="q2" class="question">
+        <h1>آیا عاشق من هستی؟ ❤️</h1>
+        <p style="font-size:1.1rem; margin:20px;">(برای جواب دادن باید موس یا انگشتت رو تکون بدی!)</p>
+        <button onclick="trickQuestion()">بله</button>
+        <button onclick="trickQuestion()">قطعاً بله</button>
+    </div>
+
+    <div id="q3" class="question">
+        <h1>امسال چند تا دروغ گفتی؟</h1>
+        <div class="option" onclick="selectOption(3, '0-5')">0 تا ۵ تا</div>
+        <div class="option" onclick="selectOption(3, '6-20')">۶ تا ۲۰ تا</div>
+        <div class="option" onclick="selectOption(3, 'بی شمار')">بی شمار 😂</div>
+    </div>
+
+    <div id="q4" class="question">
+        <h1>بدترین عادتت چیه؟</h1>
+        <input type="text" id="q4answer" placeholder="بنویس...">
         <br><br>
-        <button onclick="sendData()">ارسال به امیررضا</button>
+        <button onclick="next(4)">ارسال</button>
+    </div>
+
+    <div id="q5" class="question">
+        <h1>آخرین چیزی که به یکی گفتی چی بود؟</h1>
+        <input type="text" id="q5answer" placeholder="بنویس...">
+        <br><br>
+        <button onclick="finish()">ارسال همه جواب‌ها به امیررضا</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        setTimeout(() => {
-            document.getElementById('hello').style.display = 'none';
-            document.getElementById('question').style.display = 'block';
-            document.getElementById('answerInput').focus();
-        }, 1400);
+        let answers = {};
 
-        function sendData() {
-            let answer = document.getElementById('answerInput').value.trim();
-            
-            let msg = answer.includes("خوب") ? "عالیه! 😊 خوشحالم که خوبی." :
-                      (answer.includes("بد") || answer.includes("نیستم")) ? "😔 چرا؟ اگه خواستی بگو برات گوش می‌کنم." : "فهمیدم 😌";
+        function next(q) {
+            if (q === 1) answers.q1 = "خوبم";
+            document.getElementById(`q${q}`).classList.remove('active');
+            document.getElementById(`q${q+1}`).classList.add('active');
+        }
 
-            let finalText = `سلام، جوابش این بود:\n\n${answer}\n\n${msg}`;
+        function trickQuestion() {
+            alert("😏 اول یه کم موس/انگشتت رو بچرخون بعد دوباره بزن!");
+            // اینجا می‌تونی حرکت موس رو تشخیص بدی ولی فعلاً ساده نگه داشتیم
+        }
 
-            tg.sendData(finalText);
-            alert("ارسال شد ✅");
+        function selectOption(q, text) {
+            answers[`q${q}`] = text;
+            document.getElementById(`q${q}`).classList.remove('active');
+            document.getElementById(`q${q+1}`).classList.add('active');
+        }
+
+        function finish() {
+            answers.q4 = document.getElementById('q4answer').value || "نداد";
+            answers.q5 = document.getElementById('q5answer').value || "نداد";
+
+            let result = `📋 جواب‌های جدید:\n\n`;
+            result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
+            result += `۲. عاشق من هستی؟ → بله (با شیطنت!)\n`;
+            result += `۳. دروغ → ${answers.q3 || "نامشخص"}\n`;
+            result += `۴. بدترین عادت → ${answers.q4}\n`;
+            result += `۵. آخرین حرف → ${answers.q5}\n`;
+
+            tg.sendData(result);
+            alert("✅ همه جواب‌ها ارسال شد!");
             tg.close();
         }
     </script>
