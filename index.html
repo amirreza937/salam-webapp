@@ -3,57 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تست باحال امیررضا</title>
+    <title>⭐️ستاره ی زندگیم⭐️</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: Tahoma, Arial, sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin: 0; padding: 20px; text-align: center; }
-        .question { display: none; }
-        .active { display: block; }
-        h1 { font-size: 2.3rem; margin: 30px 0; }
-        button, .option {
-            background: rgba(255,255,255,0.2);
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
             color: white;
-            border: 2px solid white;
-            padding: 15px 30px;
-            margin: 12px;
-            border-radius: 15px;
-            font-size: 1.3rem;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            text-align: center;
+            overflow-x: hidden;
         }
-        #noBtn { position: relative; transition: all 0.2s; }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            animation: fadeIn 0.8s ease;
+        }
+        h1 {
+            font-size: 2.4rem;
+            margin: 40px 0 30px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .question {
+            display: none;
+            animation: slideUp 0.6s ease forwards;
+        }
+        .active { display: block; }
+        
+        button, .option {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+            padding: 16px 28px;
+            margin: 12px;
+            border-radius: 20px;
+            font-size: 1.25rem;
+            width: 85%;
+            transition: all 0.3s;
+        }
+        button:hover, .option:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        #noBtn {
+            position: relative;
+            transition: all 0.15s ease;
+        }
+        input {
+            width: 85%;
+            padding: 18px;
+            font-size: 1.2rem;
+            border-radius: 20px;
+            border: none;
+            margin: 25px 0;
+            text-align: center;
+        }
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+        @keyframes slideUp { from {transform: translateY(30px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
     </style>
 </head>
 <body>
-    <div id="q1" class="question active">
-        <h1>سلام 👋 چطوری؟</h1>
-        <button onclick="next(1, 'خوبم 😊')">خوبم 😊</button>
-        <button onclick="next(1, 'بد نیستم')">بد نیستم</button>
-    </div>
+    <div class="container">
+        <!-- سوال ۱ -->
+        <div id="q1" class="question active">
+            <h1>سلام! 👋<br>امروز چطوری؟</h1>
+            <button onclick="next(1, 'عالی‌ام 🔥')">عالی‌ام 🔥</button>
+            <button onclick="next(1, 'خوبم')">خوبم</button>
+            <button onclick="next(1, 'م ordinary')">م ordinary</button>
+        </div>
 
-    <div id="q2" class="question">
-        <h1>آیا عاشق من هستی؟ ❤️</h1>
-        <button onclick="next(2, 'بله ❤️')">بله ❤️</button>
-        <button id="noBtn" onmouseover="moveButton(this)">خیر 😏</button>
-    </div>
+        <!-- سوال شیطون ۲ -->
+        <div id="q2" class="question">
+            <h1>راستشو بگو...<br>عاشق من هستی؟ ❤️</h1>
+            <button onclick="next(2, 'بله خیلی ❤️')">بله خیلی ❤️</button>
+            <button id="noBtn" onmouseover="moveNoButton(this)">خیر 😌</button>
+        </div>
 
-    <div id="q3" class="question">
-        <h1>امسال چند تا دروغ گفتی؟</h1>
-        <button onclick="next(3, '0-5')">0 تا ۵ تا</button>
-        <button onclick="next(3, '6-20')">۶ تا ۲۰ تا</button>
-        <button onclick="next(3, 'بی شمار')">بی شمار 😂</button>
-    </div>
+        <!-- سوال‌های بعدی رو بعداً اضافه می‌کنیم -->
+        <div id="q3" class="question">
+            <h1>سوال ۳ (بعداً عوض می‌کنیم)</h1>
+            <button onclick="next(3, 'گزینه ۱')">گزینه ۱</button>
+            <button onclick="next(3, 'گزینه ۲')">گزینه ۲</button>
+        </div>
 
-    <div id="q4" class="question">
-        <h1>بدترین عادتت چیه؟</h1>
-        <input type="text" id="q4answer" placeholder="بنویس...">
-        <br><br>
-        <button onclick="next(4)">بعدی</button>
-    </div>
-
-    <div id="q5" class="question">
-        <h1>آخرین چیزی که به یکی گفتی چی بود؟</h1>
-        <input type="text" id="q5answer" placeholder="بنویس...">
-        <br><br>
-        <button onclick="finish()">ارسال همه به امیررضا</button>
+        <div id="finish" class="question">
+            <h1>تموم شد! 🎉</h1>
+            <button onclick="finishTest()">ارسال جواب‌ها به امیررضا</button>
+        </div>
     </div>
 
     <script>
@@ -65,41 +106,33 @@
         function next(q, text) {
             answers[`q${q}`] = text;
             document.getElementById(`q${q}`).classList.remove('active');
-            document.getElementById(`q${q+1}`).classList.add('active');
+            const nextQ = document.getElementById(`q${q+1}`);
+            if (nextQ) nextQ.classList.add('active');
+            else document.getElementById('finish').classList.add('active');
         }
 
-        function moveButton(btn) {
-            const x = Math.random() * 250 - 125;
-            const y = Math.random() * 180 - 90;
+        function moveNoButton(btn) {
+            const x = Math.random() * 280 - 140;
+            const y = Math.random() * 200 - 100;
             btn.style.transform = `translate(${x}px, ${y}px)`;
         }
 
-        function finish() {
-            answers.q4 = document.getElementById('q4answer').value || "نداد";
-            answers.q5 = document.getElementById('q5answer').value || "نداد";
+        function finishTest() {
+            let result = `📋 تست جدید از یک نفر:\n\n`;
+            Object.keys(answers).forEach(key => {
+                result += `${key}: ${answers[key]}\n`;
+            });
 
-            let result = `📋 جواب جدید:\n\n`;
-            result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
-            result += `۲. عاشق من هستی؟ → ${answers.q2 || "بله"}\n`;
-            result += `۳. دروغ → ${answers.q3 || "نامشخص"}\n`;
-            result += `۴. بدترین عادت → ${answers.q4}\n`;
-            result += `۵. آخرین حرف → ${answers.q5}\n`;
-
-            // ارسال مستقیم به چت تو
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
 
             fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: result,
-                    parse_mode: 'HTML'
-                })
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ chat_id: chatId, text: result })
             });
 
-            alert("✅ همه جواب‌ها به امیررضا ارسال شد!");
+            alert("✅ همه جواب‌ها با موفقیت ارسال شد!");
             tg.close();
         }
     </script>
