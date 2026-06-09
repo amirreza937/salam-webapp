@@ -63,7 +63,7 @@
             <h1 id="empathyText">ای وای خیلی ناراحتم...</h1>
             <p style="font-size:1.4rem; margin:30px 0;">می‌خوای ادامه بدیم؟</p>
             <button onclick="startQuestions()">آره، ادامه بده</button>
-            <button onclick="finishAndClose(false)">نه، فعلاً بسشه</button>
+            <button onclick="forceClose()">نه، فعلاً بسشه</button>
         </div>
 
         <div id="q2" class="question">
@@ -108,16 +108,21 @@
             document.getElementById('q2').classList.add('active');
         }
 
-        // ارسال جواب + بستن صفحه
-        function finishAndClose(shouldContinue = false) {
+        // بستن قوی صفحه
+        function forceClose() {
             let result = `📋 تست جدید:\n\n`;
             result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
             if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
-            result += `\n👤 طرف ادامه نداد.`;
+            result += `\n👤 ادامه نداد.`;
 
             sendToTelegram(result);
-            alert("✅ جواب‌ها ارسال شد!");
-            tg.close();
+
+            alert("مرسی که اومدی ❤️\n\nصفحه در حال بسته شدن...");
+
+            // روش‌های مختلف بستن
+            tg.close();                    // روش اصلی تلگرام
+            window.close();                // روش معمولی
+            setTimeout(() => window.location.href = "about:blank", 800); // بستن قوی‌تر
         }
 
         function finishTest() {
@@ -137,10 +142,7 @@
             fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    chat_id: chatId, 
-                    text: text 
-                })
+                body: JSON.stringify({ chat_id: chatId, text: text })
             });
         }
     </script>
