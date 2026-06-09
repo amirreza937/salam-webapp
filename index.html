@@ -23,7 +23,7 @@
         .question { display: none; }
         .active { display: block !important; }
         
-        button {
+        button, .option {
             background: rgba(255,255,255,0.15);
             color: white;
             border: 2px solid rgba(255,255,255,0.4);
@@ -36,14 +36,6 @@
         #noBtn {
             position: relative;
             transition: all 0.12s ease-out;
-        }
-        input {
-            width: 85%;
-            padding: 18px;
-            font-size: 1.2rem;
-            border-radius: 20px;
-            border: none;
-            margin: 20px 0;
         }
     </style>
 </head>
@@ -82,11 +74,18 @@
             <button onclick="handleThirdAnswer(false)">نه، شک دارم</button>
         </div>
 
-        <!-- سوال جدید ۴ -->
         <div id="q4" class="question">
             <h1>آیا من دارم اذیتت میکنم؟ 😅</h1>
             <button onclick="handleFourthAnswer(true)">آره، داری اذیتم میکنی</button>
             <button id="noBtn" onmouseover="moveNoButton(this)">نه، اذیت نمی‌کنی</button>
+        </div>
+
+        <!-- سوال جدید ۵ -->
+        <div id="q5" class="question">
+            <h1>چقدر اذیتت میکنم؟</h1>
+            <button onclick="handleFifthAnswer('0-30')">0 تا ۳۰</button>
+            <button onclick="handleFifthAnswer('31-60')">۳۱ تا ۶۰</button>
+            <button onclick="handleFifthAnswer('61-100')">۶۱ تا ۱۰۰</button>
         </div>
 
         <div id="finish" class="question">
@@ -131,32 +130,38 @@
         function handleSecondAnswer(wantsToTalk) {
             hideAll();
             answers.q2 = wantsToTalk ? "آره، حتماً" : "نه";
-            if (wantsToTalk) {
-                document.getElementById('q3').classList.add('active');
-            } else {
-                finishAndClose();
-            }
+            if (wantsToTalk) document.getElementById('q3').classList.add('active');
+            else finishAndClose();
         }
 
         function handleThirdAnswer(isSure) {
             hideAll();
             answers.q3 = isSure ? "آره، مطمئنم" : "نه، شک دارم";
-            if (isSure) {
-                document.getElementById('q4').classList.add('active');
-            } else {
-                document.getElementById('q2').classList.add('active');
-            }
+            if (isSure) document.getElementById('q4').classList.add('active');
+            else document.getElementById('q2').classList.add('active');
         }
 
         function handleFourthAnswer(isAnnoying) {
             hideAll();
             answers.q4 = isAnnoying ? "آره، داری اذیتم میکنی" : "نه";
+            document.getElementById('q5').classList.add('active');
+        }
+
+        function handleFifthAnswer(level) {
+            hideAll();
+            answers.q5 = level;
+
+            if (level === '0-30') {
+                alert("مطمئنی انقدر کمه؟ 😏");
+            } else {
+                alert("میفهمم، قابل درکه!");
+            }
             document.getElementById('finish').classList.add('active');
         }
 
         function moveNoButton(btn) {
             const x = Math.random() * 300 - 150;
-            const y = Math.random() * 200 - 100;
+            const y = Math.random() * 220 - 110;
             btn.style.transform = `translate(${x}px, ${y}px)`;
         }
 
@@ -167,6 +172,7 @@
             result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "نامشخص"}\n`;
             if (answers.q3) result += `۳. مطمئن بود؟ → ${answers.q3}\n`;
             if (answers.q4) result += `۴. اذیت میکنم؟ → ${answers.q4}\n`;
+            if (answers.q5) result += `۵. چقدر؟ → ${answers.q5}\n`;
 
             sendToTelegram(result);
             alert("مرسی که اومدی ❤️");
@@ -181,6 +187,7 @@
             result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "آره"}\n`;
             result += `۳. مطمئن بود؟ → ${answers.q3 || "آره"}\n`;
             result += `۴. اذیت میکنم؟ → ${answers.q4 || "نامشخص"}\n`;
+            result += `۵. چقدر؟ → ${answers.q5 || "نامشخص"}\n`;
 
             sendToTelegram(result);
             alert("✅ جواب‌ها ارسال شد!");
