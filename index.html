@@ -46,14 +46,12 @@
 <body>
     <div class="container">
 
-        <!-- سوال اول -->
         <div id="q1" class="question active">
             <h1>امروز چطوری؟</h1>
             <button onclick="handleFirstAnswer('خوبم')">خوبم 😊</button>
             <button onclick="handleFirstAnswer('خوب نیستم')">خوب نیستم 😔</button>
         </div>
 
-        <!-- دلیل ناراحتی -->
         <div id="reason" class="question">
             <h1>چرا خوب نیستی؟</h1>
             <input type="text" id="reasonInput" placeholder="دلیلش رو بنویس...">
@@ -61,15 +59,13 @@
             <button onclick="submitReason()">ارسال دلیل</button>
         </div>
 
-        <!-- صفحه همدردی + ادامه -->
         <div id="empathyPage" class="question">
             <h1 id="empathyText">ای وای خیلی ناراحتم...</h1>
             <p style="font-size:1.4rem; margin:30px 0;">می‌خوای ادامه بدیم؟</p>
             <button onclick="startQuestions()">آره، ادامه بده</button>
-            <button onclick="closeApp()">نه، فعلاً بسشه</button>
+            <button onclick="finishAndClose(false)">نه، فعلاً بسشه</button>
         </div>
 
-        <!-- سوالات بعدی -->
         <div id="q2" class="question">
             <h1>سوال دوم (بعداً طراحی می‌کنیم)</h1>
             <button onclick="finishTest()">پایان و ارسال جواب‌ها</button>
@@ -112,8 +108,15 @@
             document.getElementById('q2').classList.add('active');
         }
 
-        function closeApp() {
-            alert("مرسی که اومدی ❤️");
+        // ارسال جواب + بستن صفحه
+        function finishAndClose(shouldContinue = false) {
+            let result = `📋 تست جدید:\n\n`;
+            result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
+            if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
+            result += `\n👤 طرف ادامه نداد.`;
+
+            sendToTelegram(result);
+            alert("✅ جواب‌ها ارسال شد!");
             tg.close();
         }
 
@@ -122,17 +125,23 @@
             result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
             if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
 
+            sendToTelegram(result);
+            alert("✅ جواب‌ها ارسال شد!");
+            tg.close();
+        }
+
+        function sendToTelegram(text) {
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
 
             fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ chat_id: chatId, text: result })
+                body: JSON.stringify({ 
+                    chat_id: chatId, 
+                    text: text 
+                })
             });
-
-            alert("✅ جواب‌ها ارسال شد!");
-            tg.close();
         }
     </script>
 </body>
