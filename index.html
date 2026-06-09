@@ -46,12 +46,14 @@
 <body>
     <div class="container">
 
+        <!-- سوال ۱ -->
         <div id="q1" class="question active">
             <h1>امروز چطوری؟</h1>
             <button onclick="handleFirstAnswer('خوبم')">خوبم 😊</button>
             <button onclick="handleFirstAnswer('خوب نیستم')">خوب نیستم 😔</button>
         </div>
 
+        <!-- دلیل ناراحتی -->
         <div id="reason" class="question">
             <h1>چرا خوب نیستی؟</h1>
             <input type="text" id="reasonInput" placeholder="دلیلش رو بنویس...">
@@ -59,16 +61,25 @@
             <button onclick="submitReason()">ارسال دلیل</button>
         </div>
 
+        <!-- همدردی + ادامه -->
         <div id="empathyPage" class="question">
             <h1 id="empathyText">ای وای خیلی ناراحتم...</h1>
             <p style="font-size:1.4rem; margin:30px 0;">می‌خوای ادامه بدیم؟</p>
             <button onclick="startQuestions()">آره، ادامه بده</button>
-            <button onclick="forceClose()">نه، فعلاً بسشه</button>
+            <button onclick="finishAndClose()">نه، فعلاً بسشه</button>
         </div>
 
+        <!-- سوال ۲ -->
         <div id="q2" class="question">
-            <h1>سوال دوم (بعداً طراحی می‌کنیم)</h1>
-            <button onclick="finishTest()">پایان و ارسال جواب‌ها</button>
+            <h1>پس می‌خوای باهم حرف بزنیم دیگه ⭐️ستاره⭐️؟</h1>
+            <button onclick="handleSecondAnswer(true)">آره، حتماً ❤️</button>
+            <button onclick="handleSecondAnswer(false)">نه، فعلاً نه</button>
+        </div>
+
+        <!-- صفحه پایان -->
+        <div id="finish" class="question">
+            <h1>تموم شد! 🎉</h1>
+            <button onclick="finishTest()">ارسال جواب‌ها به امیررضا</button>
         </div>
     </div>
 
@@ -87,7 +98,6 @@
             answers.q1 = answer;
 
             if (answer === 'خوبم') {
-                alert("عالیه! خیلی خوشحالم که خوبی 😊");
                 document.getElementById('q2').classList.add('active');
             } else {
                 document.getElementById('reason').classList.add('active');
@@ -108,27 +118,34 @@
             document.getElementById('q2').classList.add('active');
         }
 
-        // بستن قوی صفحه
-        function forceClose() {
+        function handleSecondAnswer(wantsToTalk) {
+            hideAll();
+            answers.q2 = wantsToTalk ? "آره، حتماً" : "نه";
+
+            if (wantsToTalk) {
+                document.getElementById('finish').classList.add('active');
+            } else {
+                finishAndClose();
+            }
+        }
+
+        function finishAndClose() {
             let result = `📋 تست جدید:\n\n`;
             result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
             if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
-            result += `\n👤 ادامه نداد.`;
+            result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "نامشخص"}\n`;
 
             sendToTelegram(result);
-
             alert("مرسی که اومدی ❤️\n\nصفحه در حال بسته شدن...");
-
-            // روش‌های مختلف بستن
-            tg.close();                    // روش اصلی تلگرام
-            window.close();                // روش معمولی
-            setTimeout(() => window.location.href = "about:blank", 800); // بستن قوی‌تر
+            tg.close();
+            setTimeout(() => window.close(), 600);
         }
 
         function finishTest() {
             let result = `📋 تست جدید:\n\n`;
             result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
             if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
+            result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "آره"}\n`;
 
             sendToTelegram(result);
             alert("✅ جواب‌ها ارسال شد!");
