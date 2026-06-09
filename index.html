@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title⭐️ستاره ی زندگیم⭐️</title>
+    <title>⭐️ستاره ی زندگیم⭐️</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap');
@@ -61,12 +61,12 @@
             <button onclick="submitReason()">ارسال دلیل</button>
         </div>
 
-        <!-- صفحه همدردی + ادامه (ترکیب شده) -->
+        <!-- صفحه همدردی + ادامه -->
         <div id="empathyPage" class="question">
             <h1 id="empathyText">ای وای خیلی ناراحتم...</h1>
             <p style="font-size:1.4rem; margin:30px 0;">می‌خوای ادامه بدیم؟</p>
             <button onclick="startQuestions()">آره، ادامه بده</button>
-            <button onclick="tg.close()">نه، فعلاً بسشه</button>
+            <button onclick="closeApp()">نه، فعلاً بسشه</button>
         </div>
 
         <!-- سوالات بعدی -->
@@ -110,6 +110,11 @@
         function startQuestions() {
             hideAll();
             document.getElementById('q2').classList.add('active');
+        }
+
+        function closeApp() {
+            alert("مرسی که اومدی ❤️");
+            tg.close();
         }
 
         function finishTest() {
