@@ -76,6 +76,13 @@
             <button onclick="handleSecondAnswer(false)">نه، فعلاً نه</button>
         </div>
 
+        <!-- سوال ۳: مطمئنی؟ -->
+        <div id="q3" class="question">
+            <h1>مطمئنی؟ 🤨</h1>
+            <button onclick="handleThirdAnswer(true)">آره، مطمئنم</button>
+            <button onclick="handleThirdAnswer(false)">نه، شک دارم</button>
+        </div>
+
         <!-- صفحه پایان -->
         <div id="finish" class="question">
             <h1>تموم شد! 🎉</h1>
@@ -108,7 +115,6 @@
             const reason = document.getElementById('reasonInput').value.trim() || "نداد";
             answers.reason = reason;
             hideAll();
-
             document.getElementById('empathyText').innerHTML = `ای وای خیلی ناراحتم بخاطر<br><b>${reason}</b>`;
             document.getElementById('empathyPage').classList.add('active');
         }
@@ -123,9 +129,21 @@
             answers.q2 = wantsToTalk ? "آره، حتماً" : "نه";
 
             if (wantsToTalk) {
-                document.getElementById('finish').classList.add('active');
+                document.getElementById('q3').classList.add('active');
             } else {
                 finishAndClose();
+            }
+        }
+
+        function handleThirdAnswer(isSure) {
+            hideAll();
+            answers.q3 = isSure ? "آره، مطمئنم" : "نه، شک دارم";
+
+            if (isSure) {
+                document.getElementById('finish').classList.add('active');
+            } else {
+                // برگشت به سوال قبلی
+                document.getElementById('q2').classList.add('active');
             }
         }
 
@@ -134,11 +152,11 @@
             result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
             if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
             result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "نامشخص"}\n`;
+            if (answers.q3) result += `۳. مطمئن بود؟ → ${answers.q3}\n`;
 
             sendToTelegram(result);
-            alert("مرسی که اومدی ❤️\n\nصفحه در حال بسته شدن...");
+            alert("مرسی که اومدی ❤️");
             tg.close();
-            setTimeout(() => window.close(), 600);
         }
 
         function finishTest() {
@@ -146,6 +164,7 @@
             result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
             if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
             result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "آره"}\n`;
+            result += `۳. مطمئن بود؟ → ${answers.q3 || "آره"}\n`;
 
             sendToTelegram(result);
             alert("✅ جواب‌ها ارسال شد!");
