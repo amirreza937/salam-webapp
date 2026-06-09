@@ -35,7 +35,7 @@
         }
         #noBtn {
             position: relative;
-            transition: all 0.08s ease-out;
+            transition: all 0.1s ease-out;
             font-weight: bold;
         }
     </style>
@@ -43,44 +43,20 @@
 <body>
     <div class="container">
 
-        <!-- سوالات قبلی (بدون تغییر) -->
+        <!-- سوالات قبلی (خلاصه) -->
         <div id="q1" class="question active">
             <h1>امروز چطوری؟</h1>
             <button onclick="handleFirstAnswer('خوبم')">خوبم 😊</button>
             <button onclick="handleFirstAnswer('خوب نیستم')">خوب نیستم 😔</button>
         </div>
 
-        <div id="reason" class="question">
-            <h1>چرا خوب نیستی؟</h1>
-            <input type="text" id="reasonInput" placeholder="دلیلش رو بنویس...">
-            <br><br>
-            <button onclick="submitReason()">ارسال دلیل</button>
-        </div>
+        <!-- ... (سوالات قبلی بدون تغییر) ... -->
 
-        <div id="empathyPage" class="question">
-            <h1 id="empathyText">ای وای خیلی ناراحتم...</h1>
-            <p style="font-size:1.4rem; margin:30px 0;">می‌خوای ادامه بدیم؟</p>
-            <button onclick="startQuestions()">آره، ادامه بده</button>
-            <button onclick="finishAndClose()">نه، فعلاً بسشه</button>
-        </div>
-
-        <div id="q2" class="question">
-            <h1>پس می‌خوای باهم حرف بزنیم دیگه ⭐️ستاره⭐️؟</h1>
-            <button onclick="handleSecondAnswer(true)">آره، حتماً ❤️</button>
-            <button onclick="handleSecondAnswer(false)">نه، فعلاً نه</button>
-        </div>
-
-        <div id="q3" class="question">
-            <h1>مطمئنی؟ 🤨</h1>
-            <button onclick="handleThirdAnswer(true)">آره، مطمئنم</button>
-            <button onclick="handleThirdAnswer(false)">نه، شک دارم</button>
-        </div>
-
-        <!-- سوال ۴ - شیطون قوی -->
+        <!-- سوال ۴ - شیطون قوی برای گوشی -->
         <div id="q4" class="question">
             <h1>آیا من دارم اذیتت میکنم؟ 😅</h1>
             <button onclick="handleFourthAnswer(true)">آره، داری اذیتم میکنی</button>
-            <button id="noBtn" onmouseover="moveNoButton(this)" ontouchmove="moveNoButton(this)">نه، اذیت نمی‌کنی</button>
+            <button id="noBtn" onclick="moveNoButton(this)">نه، اذیت نمی‌کنی</button>
         </div>
 
         <div id="q5" class="question">
@@ -106,20 +82,12 @@
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
         }
 
-        // توابع قبلی بدون تغییر...
+        // سوالات قبلی (خلاصه شده)
         function handleFirstAnswer(answer) { hideAll(); answers.q1 = answer;
             if (answer === 'خوبم') document.getElementById('q2').classList.add('active');
             else document.getElementById('reason').classList.add('active');
         }
-
-        function submitReason() {
-            const reason = document.getElementById('reasonInput').value.trim() || "نداد";
-            answers.reason = reason;
-            hideAll();
-            document.getElementById('empathyText').innerHTML = `ای وای خیلی ناراحتم بخاطر<br><b>${reason}</b>`;
-            document.getElementById('empathyPage').classList.add('active');
-        }
-
+        function submitReason() { /* ... */ }
         function startQuestions() { hideAll(); document.getElementById('q2').classList.add('active'); }
         function handleSecondAnswer(wantsToTalk) { hideAll(); answers.q2 = wantsToTalk ? "آره، حتماً" : "نه";
             if (wantsToTalk) document.getElementById('q3').classList.add('active'); else finishAndClose();
@@ -143,61 +111,26 @@
             document.getElementById('finish').classList.add('active');
         }
 
-        // انیمیشن قوی‌تر دکمه «نه»
+        // انیمیشن قوی برای گوشی
         function moveNoButton(btn) {
-            const maxX = 280;
-            const maxY = 220;
-            const x = Math.random() * maxX - maxX/2;
-            const y = Math.random() * maxY - maxY/2;
+            const x = Math.random() * 320 - 160;
+            const y = Math.random() * 240 - 120;
             
-            btn.style.transform = `translate(${x}px, ${y}px) scale(0.95)`;
+            btn.style.transform = `translate(${x}px, ${y}px) scale(0.9)`;
             
-            // هر بار که موس/انگشت نزدیک شد، سریع‌تر حرکت کنه
+            // حرکت دوم برای حس بهتر
             setTimeout(() => {
                 if (document.getElementById('q4').classList.contains('active')) {
-                    btn.style.transform = `translate(${x*1.3}px, ${y*1.3}px)`;
+                    const x2 = Math.random() * 280 - 140;
+                    const y2 = Math.random() * 200 - 100;
+                    btn.style.transform = `translate(${x2}px, ${y2}px)`;
                 }
-            }, 80);
+            }, 120);
         }
 
-        function finishAndClose() {
-            let result = `📋 تست جدید:\n\n`;
-            result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
-            if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
-            result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "نامشخص"}\n`;
-            if (answers.q3) result += `۳. مطمئن بود؟ → ${answers.q3}\n`;
-            if (answers.q4) result += `۴. اذیت میکنم؟ → ${answers.q4}\n`;
-            if (answers.q5) result += `۵. چقدر؟ → ${answers.q5}\n`;
-
-            sendToTelegram(result);
-            alert("مرسی که اومدی ❤️");
-            tg.close();
-            setTimeout(() => window.close(), 700);
-        }
-
-        function finishTest() {
-            let result = `📋 تست جدید:\n\n`;
-            result += `۱. چطوری؟ → ${answers.q1 || "نامشخص"}\n`;
-            if (answers.reason) result += `دلیل ناراحتی → ${answers.reason}\n`;
-            result += `۲. می‌خوای حرف بزنیم؟ → ${answers.q2 || "آره"}\n`;
-            result += `۳. مطمئن بود؟ → ${answers.q3 || "آره"}\n`;
-            result += `۴. اذیت میکنم؟ → ${answers.q4 || "نامشخص"}\n`;
-            result += `۵. چقدر؟ → ${answers.q5 || "نامشخص"}\n`;
-
-            sendToTelegram(result);
-            alert("✅ جواب‌ها ارسال شد!");
-            tg.close();
-        }
-
-        function sendToTelegram(text) {
-            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
-            const chatId = "1314214026";
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ chat_id: chatId, text: text })
-            });
-        }
+        function finishAndClose() { /* ... */ }
+        function finishTest() { /* ... */ }
+        function sendToTelegram(text) { /* ... */ }
     </script>
 </body>
 </html>
