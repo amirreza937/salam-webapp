@@ -30,6 +30,14 @@
             display: block;
         }
         button:active { transform: scale(0.95); background: rgba(255,255,255,0.45) !important; }
+        input {
+            width: 80%;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border: none;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
@@ -57,10 +65,45 @@
         <div id="sorry" style="display:none">
             <h1>ببخشید سر سوال قبلی، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
-            <button onclick="finishWithAnswer('بله، زیاد')">بله، زیاد</button>
-            <button onclick="finishWithAnswer('گاهی')">گاهی</button>
-            <button onclick="finishWithAnswer('تقریباً نه')">تقریباً نه</button>
-            <button onclick="finishWithAnswer('نه')">نه</button>
+            <button onclick="answerRealQ2('بله، زیاد')">بله، زیاد</button>
+            <button onclick="answerRealQ2('گاهی')">گاهی</button>
+            <button onclick="answerRealQ2('تقریباً نه')">تقریباً نه</button>
+            <button onclick="answerRealQ2('نه')">نه</button>
+        </div>
+
+        <!-- سوال ۳ -->
+        <div id="q3" style="display:none">
+            <h1>دلیل اصلی اینکه گفتی نمی‌خوای در ارتباط باشیم چی بود؟</h1>
+            <input type="text" id="reasonInput" placeholder="دلیلت رو بنویس...">
+            <br><br>
+            <button onclick="submitReason()">ارسال</button>
+        </div>
+
+        <!-- سوال ۴ -->
+        <div id="q4" style="display:none">
+            <h1>الان نسبت به من چه حسی داری؟</h1>
+            <button onclick="answerQ4('هنوز دوستت دارم')">هنوز دوستت دارم ❤️</button>
+            <button onclick="answerQ4('دلتنگتم')">دلتنگتم</button>
+            <button onclick="answerQ4('گیج و بلاتکلیفم')">گیج و بلاتکلیفم</button>
+            <button onclick="answerQ4('بی‌تفاوتم')">بی‌تفاوتم</button>
+            <button onclick="answerQ4('عصبانی‌ام')">عصبانی‌ام</button>
+        </div>
+
+        <!-- سوال ۵ -->
+        <div id="q5" style="display:none">
+            <h1>دوست داری بین ما چه رابطه‌ای باشه؟</h1>
+            <button onclick="answerQ5('کامل فاصله بگیریم')">کامل فاصله بگیریم</button>
+            <button onclick="answerQ5('دوست بمونیم')">دوست بمونیم</button>
+            <button onclick="answerQ5('گاهی حرف بزنیم')">گاهی حرف بزنیم</button>
+            <button onclick="answerQ5('رابطه جدی')">رابطه جدی</button>
+        </div>
+
+        <!-- سوال ۶ -->
+        <div id="q6" style="display:none">
+            <h1>آخرین سوال ❤️</h1>
+            <p>دوست داری بعد از این جواب‌ها باهم حرف بزنیم؟</p>
+            <button onclick="finishQuiz('آره')">آره، دوست دارم حرف بزنیم</button>
+            <button onclick="finishQuiz('نه')">نه، ترجیح می‌دم تموم بشه</button>
         </div>
 
         <!-- پایان -->
@@ -75,10 +118,7 @@
         let tg = null;
         try {
             tg = window.Telegram.WebApp;
-            if (tg) {
-                tg.expand();
-                tg.ready();
-            }
+            if (tg) { tg.expand(); tg.ready(); }
         } catch(e) {}
 
         let answers = {};
@@ -97,10 +137,7 @@
                 const x = Math.random() * 40 - 20;
                 btn.style.transform = `translate(${x}px, ${Math.random()*20-10}px)`;
                 i++;
-                if (i > 12) {
-                    clearInterval(int);
-                    btn.style.transform = '';
-                }
+                if (i > 12) { clearInterval(int); btn.style.transform = ''; }
             }, 70);
         }
 
@@ -108,15 +145,39 @@
             answers.q2 = "نه";
             document.getElementById('q2').style.display = 'none';
             document.getElementById('sorry').style.display = 'block';
-            
             if (!hasClickedFake) {
                 sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه"`);
             }
         }
 
-        function finishWithAnswer(ans) {
+        function answerRealQ2(ans) {
             answers.q2 = ans;
             document.getElementById('sorry').style.display = 'none';
+            document.getElementById('q3').style.display = 'block';
+        }
+
+        window.submitReason = function() {
+            const reason = document.getElementById('reasonInput').value.trim() || "نداد";
+            answers.q3 = reason;
+            document.getElementById('q3').style.display = 'none';
+            document.getElementById('q4').style.display = 'block';
+        };
+
+        function answerQ4(ans) {
+            answers.q4 = ans;
+            document.getElementById('q4').style.display = 'none';
+            document.getElementById('q5').style.display = 'block';
+        }
+
+        function answerQ5(ans) {
+            answers.q5 = ans;
+            document.getElementById('q5').style.display = 'none';
+            document.getElementById('q6').style.display = 'block';
+        }
+
+        function finishQuiz(ans) {
+            answers.q6 = ans;
+            document.getElementById('q6').style.display = 'none';
             document.getElementById('finish').style.display = 'block';
             sendToTelegram();
         }
@@ -125,6 +186,10 @@
             let result = `⭐️ جواب‌های ستاره ⭐️\n\n`;
             result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
             result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
+            result += `۳. دلیل قطع ارتباط: ${answers.q3 || "نامشخص"}\n`;
+            result += `۴. احساس فعلی: ${answers.q4 || "نامشخص"}\n`;
+            result += `۵. رابطه مورد نظر: ${answers.q5 || "نامشخص"}\n`;
+            result += `۶. نهایی: ${answers.q6 || "نامشخص"}\n`;
 
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
