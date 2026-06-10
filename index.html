@@ -58,7 +58,7 @@
             <button onclick="nextQuestion(1, 'ناراحتم/دلتنگی')">ناراحتم / دلتنگم</button>
         </div>
 
-        <!-- سوال ۲ - شیطونی -->
+        <!-- سوال ۲ -->
         <div id="q2" class="question">
             <h1>این مدت به من فکر کردی؟</h1>
             <button onclick="shakeButton(this)">بله، زیاد</button>
@@ -67,7 +67,7 @@
             <button onclick="handleDirectNo()">نه</button>
         </div>
 
-        <!-- صفحه عذرخواهی -->
+        <!-- صفحه معذرت‌خواهی -->
         <div id="sorryThink" class="question">
             <h1>ببخشید حالا، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
@@ -120,7 +120,7 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         let answers = {};
-        let directNoClicked = false;
+        let hasClickedFake = false;   // آیا گزینه تکان‌خور زده یا نه
 
         function hideAll() {
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
@@ -137,6 +137,7 @@
         }
 
         function shakeButton(btn) {
+            hasClickedFake = true;   // مهم: علامت می‌زنیم که گزینه فیک زده
             let i = 0;
             const interval = setInterval(() => {
                 const x = Math.random() * 40 - 20;
@@ -150,16 +151,17 @@
             }, 70);
         }
 
-        // فقط وقتی مستقیم "نه" زده بشه
         function handleDirectNo() {
-            directNoClicked = true;
             answers.q2 = "نه";
             hideAll();
             document.getElementById('sorryThink').classList.add('active');
             
-            let result = `⚠️ ستاره همون بار اول مستقیم گفت "نه" به فکر کردن\n`;
-            result += `زمان: ${new Date().toLocaleString('fa-IR')}`;
-            sendSpecialMessage(result);
+            // فقط اگر هیچ گزینه فیکی نزده باشد
+            if (!hasClickedFake) {
+                let result = `⚠️ ستاره همون بار اول مستقیم گفت "نه" به فکر کردن\n`;
+                result += `زمان: ${new Date().toLocaleString('fa-IR')}`;
+                sendSpecialMessage(result);
+            }
         }
 
         function submitReason() {
