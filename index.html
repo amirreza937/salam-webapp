@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⭐️ ستاره ی زندگیم ⭐️</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -16,6 +16,7 @@
             padding: 20px;
             min-height: 100vh;
             text-align: center;
+            touch-action: manipulation;
         }
         .container { max-width: 480px; margin: 0 auto; }
         h1 { font-size: 2.1rem; margin: 30px 0 20px; line-height: 1.4; }
@@ -28,14 +29,20 @@
             background: rgba(255,255,255,0.15);
             color: white;
             border: 2px solid rgba(255,255,255,0.4);
-            padding: 16px 25px;
-            margin: 10px;
+            padding: 18px 25px;
+            margin: 12px auto;
             border-radius: 20px;
             font-size: 1.25rem;
             width: 85%;
+            display: block;
             cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.2s;
         }
-        button:hover { background: rgba(255,255,255,0.25); }
+        button:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
+        }
         input {
             width: 80%;
             padding: 15px;
@@ -53,66 +60,32 @@
         <!-- سوال ۱ -->
         <div id="q1" class="question active">
             <h1>سلام ستاره، حال دلت چطوره این روزها؟</h1>
-            <button onclick="nextQuestion(1, 'خوبم')">خوبم 😊</button>
-            <button onclick="nextQuestion(1, 'متوسطم')">متوسطم</button>
-            <button onclick="nextQuestion(1, 'ناراحتم/دلتنگی')">ناراحتم / دلتنگم</button>
+            <button class="answer-btn" data-q="1" data-answer="خوبم">خوبم 😊</button>
+            <button class="answer-btn" data-q="1" data-answer="متوسطم">متوسطم</button>
+            <button class="answer-btn" data-q="1" data-answer="ناراحتم/دلتنگی">ناراحتم / دلتنگم</button>
         </div>
 
         <!-- سوال ۲ -->
         <div id="q2" class="question">
             <h1>این مدت به من فکر کردی؟</h1>
-            <button onclick="shakeButton(this)">بله، زیاد</button>
-            <button onclick="shakeButton(this)">گاهی</button>
-            <button onclick="shakeButton(this)">تقریباً نه</button>
-            <button onclick="handleDirectNo()">نه</button>
+            <button class="fake-btn">بله، زیاد</button>
+            <button class="fake-btn">گاهی</button>
+            <button class="fake-btn">تقریباً نه</button>
+            <button class="answer-btn" data-q="2" data-answer="نه">نه</button>
         </div>
 
         <!-- صفحه معذرت‌خواهی -->
         <div id="sorryThink" class="question">
             <h1>ببخشید سر سوال قبلی، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
-            <button onclick="nextQuestion(2, 'بله، زیاد')">بله، زیاد</button>
-            <button onclick="nextQuestion(2, 'گاهی')">گاهی</button>
-            <button onclick="nextQuestion(2, 'تقریباً نه')">تقریباً نه</button>
-            <button onclick="nextQuestion(2, 'نه')">نه</button>
+            <button class="answer-btn" data-q="2" data-answer="بله، زیاد">بله، زیاد</button>
+            <button class="answer-btn" data-q="2" data-answer="گاهی">گاهی</button>
+            <button class="answer-btn" data-q="2" data-answer="تقریباً نه">تقریباً نه</button>
+            <button class="answer-btn" data-q="2" data-answer="نه">نه</button>
         </div>
 
-        <!-- سوال ۳ -->
-        <div id="q3" class="question">
-            <h1>دلیل اصلی اینکه گفتی نمی‌خوای در ارتباط باشیم چی بود؟</h1>
-            <input type="text" id="reasonInput" placeholder="دلیلت رو بنویس...">
-            <br><br>
-            <button onclick="submitReason()">ارسال</button>
-        </div>
+        <!-- بقیه سوالات رو بعداً اضافه می‌کنیم، فعلاً اینو تست کن -->
 
-        <!-- سوال ۴ -->
-        <div id="q4" class="question">
-            <h1>الان نسبت به من چه حسی داری؟</h1>
-            <button onclick="nextQuestion(4, 'هنوز دوستت دارم')">هنوز دوستت دارم ❤️</button>
-            <button onclick="nextQuestion(4, 'دلتنگتم')">دلتنگتم</button>
-            <button onclick="nextQuestion(4, 'گیج و بلاتکلیفم')">گیج و بلاتکلیفم</button>
-            <button onclick="nextQuestion(4, 'بی‌تفاوتم')">بی‌تفاوتم</button>
-            <button onclick="nextQuestion(4, 'عصبانی‌ام')">عصبانی‌ام</button>
-        </div>
-
-        <!-- سوال ۵ -->
-        <div id="q5" class="question">
-            <h1>دوست داری بین ما چه رابطه‌ای باشه؟</h1>
-            <button onclick="nextQuestion(5, 'کامل فاصله بگیریم')">کامل فاصله بگیریم</button>
-            <button onclick="nextQuestion(5, 'دوست بمونیم')">دوست بمونیم</button>
-            <button onclick="nextQuestion(5, 'گاهی حرف بزنیم')">گاهی حرف بزنیم</button>
-            <button onclick="nextQuestion(5, 'رابطه جدی')">رابطه جدی</button>
-        </div>
-
-        <!-- سوال نهایی -->
-        <div id="q6" class="question">
-            <h1>آخرین سوال ❤️</h1>
-            <p>دوست داری بعد از این جواب‌ها باهم حرف بزنیم؟</p>
-            <button onclick="finalAnswer(true)">آره، دوست دارم حرف بزنیم</button>
-            <button onclick="finalAnswer(false)">نه، ترجیح می‌دم تموم بشه</button>
-        </div>
-
-        <!-- صفحه پایان -->
         <div id="finish" class="question">
             <h1>ممنون که جواب دادی ⭐️</h1>
             <p>جواب‌هات ارسال شد.</p>
@@ -131,16 +104,29 @@
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
         }
 
-        function nextQuestion(q, answer) {
-            answers[`q${q}`] = answer;
-            currentPage = q;
-            hideAll();
-            
-            if (q === 1) document.getElementById('q2').classList.add('active');
-            else if (q === 2) document.getElementById('q3').classList.add('active');
-            else if (q === 4) document.getElementById('q5').classList.add('active');
-            else if (q === 5) document.getElementById('q6').classList.add('active');
-        }
+        // Event Listener برای همه دکمه‌ها (بهینه برای iOS)
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const q = parseInt(this.getAttribute('data-q'));
+                    const answer = this.getAttribute('data-answer');
+                    
+                    answers[`q${q}`] = answer;
+                    currentPage = q;
+                    hideAll();
+
+                    if (q === 1) document.getElementById('q2').classList.add('active');
+                    else if (q === 2) document.getElementById('q3').classList.add('active'); // بعداً اضافه می‌کنیم
+                });
+            });
+
+            // دکمه‌های فیک
+            document.querySelectorAll('.fake-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    shakeButton(this);
+                });
+            });
+        });
 
         function shakeButton(btn) {
             hasClickedFake = true;
@@ -158,85 +144,11 @@
         }
 
         function handleDirectNo() {
-            answers.q2 = "نه";
-            currentPage = 2;
-            hideAll();
-            document.getElementById('sorryThink').classList.add('active');
-            
-            if (!hasClickedFake) {
-                sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه" به فکر کردن\nزمان: ${new Date().toLocaleString('fa-IR')}`);
-            }
-        }
-
-        function submitReason() {
-            const reason = document.getElementById('reasonInput').value.trim() || "نداد";
-            answers.q3 = reason;
-            currentPage = 3;
-            hideAll();
-            document.getElementById('q4').classList.add('active');
-        }
-
-        function finalAnswer(wantsToTalk) {
-            answers.final = wantsToTalk ? "آره، دوست دارم حرف بزنیم" : "نه، ترجیح می‌دم تموم بشه";
-            hideAll();
-            document.getElementById('finish').classList.add('active');
-            sendToTelegram();
+            // بعداً کامل می‌کنیم
         }
 
         function finishTest() {
             tg.close();
-        }
-
-        // ==================== تأیید خروج ====================
-        function showExitConfirm() {
-            if (currentPage >= 6) return;
-
-            if (confirm("مطمئنی می‌خوای بری؟")) {
-                if (confirm("جوابایی که تا اینجا دادی رو برای امیررضا ارسال کنم؟")) {
-                    sendToTelegram();
-                } else {
-                    sendSpecialMessage(`⚠️ ستاره میخواست بره بیرون و جوابا رو نمیخواست بده.\nتا صفحه ${currentPage} جواب داده بود.\nزمان: ${new Date().toLocaleString('fa-IR')}`);
-                }
-                tg.close();
-            }
-        }
-
-        tg.BackButton.show();
-        tg.onEvent('backButtonClicked', showExitConfirm);
-
-        window.addEventListener('beforeunload', (e) => {
-            showExitConfirm();
-            e.preventDefault();
-            e.returnValue = '';
-        });
-
-        function sendToTelegram() {
-            let result = `⭐️ جواب‌های ستاره (تا صفحه ${currentPage}) ⭐️\n\n`;
-            result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
-            result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
-            result += `۳. دلیل قطع ارتباط: ${answers.q3 || "نامشخص"}\n`;
-            result += `۴. احساس فعلی: ${answers.q4 || "نامشخص"}\n`;
-            result += `۵. رابطه مورد نظر: ${answers.q5 || "نامشخص"}\n`;
-            result += `۶. نهایی: ${answers.final || "نامشخص"}\n`;
-
-            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
-            const chatId = "1314214026";
-
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ chat_id: chatId, text: result })
-            });
-        }
-
-        function sendSpecialMessage(text) {
-            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
-            const chatId = "1314214026";
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ chat_id: chatId, text: text })
-            });
         }
     </script>
 </body>
