@@ -11,7 +11,8 @@
         
         body {
             font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            background: linear-gradient(135deg, #6a11cb, #2575fc) !important;
+            background-color: #2575fc !important; /* فال‌بک رنگ آبی */
             color: white;
             margin: 0;
             padding: 20px;
@@ -24,9 +25,9 @@
         .question { display: none; }
         .question.active { display: block !important; }
         button {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.2) !important;
+            color: white !important;
+            border: 2px solid rgba(255,255,255,0.5) !important;
             padding: 18px 25px;
             margin: 12px auto;
             border-radius: 20px;
@@ -35,10 +36,9 @@
             display: block;
             cursor: pointer;
             touch-action: manipulation;
-            transition: all 0.2s ease;
         }
         button:active {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.4) !important;
             transform: scale(0.95);
         }
         input {
@@ -49,7 +49,14 @@
             border: none;
             font-size: 1.1rem;
         }
-        .debug { color: #ffff00; font-size: 1rem; margin: 10px 0; }
+        .debug { 
+            color: #ffff00; 
+            font-size: 1rem; 
+            margin: 10px 0; 
+            background: rgba(0,0,0,0.4);
+            padding: 8px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -92,7 +99,7 @@
             <button onclick="submitReason()">ارسال</button>
         </div>
 
-        <!-- سوال ۴ -->
+        <!-- سوال ۴ تا ۶ و finish (کامل) -->
         <div id="q4" class="question">
             <h1>الان نسبت به من چه حسی داری؟</h1>
             <button class="answer-btn" data-q="4" data-answer="هنوز دوستت دارم">هنوز دوستت دارم ❤️</button>
@@ -102,7 +109,6 @@
             <button class="answer-btn" data-q="4" data-answer="عصبانی‌ام">عصبانی‌ام</button>
         </div>
 
-        <!-- سوال ۵ -->
         <div id="q5" class="question">
             <h1>دوست داری بین ما چه رابطه‌ای باشه؟</h1>
             <button class="answer-btn" data-q="5" data-answer="کامل فاصله بگیریم">کامل فاصله بگیریم</button>
@@ -111,7 +117,6 @@
             <button class="answer-btn" data-q="5" data-answer="رابطه جدی">رابطه جدی</button>
         </div>
 
-        <!-- سوال ۶ -->
         <div id="q6" class="question">
             <h1>آخرین سوال ❤️</h1>
             <p>دوست داری بعد از این جواب‌ها باهم حرف بزنیم؟</p>
@@ -119,7 +124,6 @@
             <button class="answer-btn" data-q="6" data-answer="نه">نه، ترجیح می‌دم تموم بشه</button>
         </div>
 
-        <!-- پایان -->
         <div id="finish" class="question">
             <h1>ممنون که جواب دادی ⭐️</h1>
             <p>جواب‌هات ارسال شد.</p>
@@ -128,7 +132,6 @@
     </div>
 
     <script>
-        // === Telegram WebApp با مدیریت خطا ===
         let tg = null;
         try {
             tg = window.Telegram.WebApp;
@@ -200,7 +203,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: result })
-            }).catch(() => {});
+            });
         }
 
         function sendSpecialMessage(text) {
@@ -210,13 +213,12 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: text })
-            }).catch(() => {});
+            });
         }
 
         function initListeners() {
-            document.getElementById('debug').textContent = "✅ آماده شد";
+            document.getElementById('debug').textContent = "✅ آماده شد - روی دکمه‌ها بزن";
 
-            // Answer buttons
             document.querySelectorAll('.answer-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const q = parseInt(this.getAttribute('data-q'));
@@ -225,11 +227,8 @@
 
                     if (q === 1) showPage('q2');
                     else if (q === 2) {
-                        if (this.id === 'directNoBtn') {
-                            handleDirectNo();
-                        } else {
-                            showPage('q3');
-                        }
+                        if (this.id === 'directNoBtn') handleDirectNo();
+                        else showPage('q3');
                     }
                     else if (q === 4) showPage('q5');
                     else if (q === 5) showPage('q6');
@@ -240,17 +239,14 @@
                 });
             });
 
-            // Fake buttons
             document.querySelectorAll('.fake-btn').forEach(btn => {
                 btn.addEventListener('click', () => shakeButton(btn));
             });
 
-            // دکمه نه مستقیم
             const directNoBtn = document.getElementById('directNoBtn');
             if (directNoBtn) directNoBtn.addEventListener('click', handleDirectNo);
         }
 
-        // شروع
         document.addEventListener('DOMContentLoaded', initListeners);
         window.addEventListener('load', initListeners);
     </script>
