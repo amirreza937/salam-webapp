@@ -21,12 +21,8 @@
         h1 { font-size: 2.1rem; margin: 30px 0 20px; line-height: 1.4; }
         p { font-size: 1.35rem; margin: 20px 0; }
         
-        .question { 
-            display: none; 
-        }
-        .question.active { 
-            display: block !important; 
-        }
+        .question { display: none; }
+        .question.active { display: block !important; }
         
         button {
             background: rgba(255,255,255,0.15);
@@ -39,9 +35,7 @@
             width: 85%;
             cursor: pointer;
         }
-        button:hover {
-            background: rgba(255,255,255,0.25);
-        }
+        button:hover { background: rgba(255,255,255,0.25); }
         input {
             width: 80%;
             padding: 15px;
@@ -64,12 +58,23 @@
             <button onclick="next(1, 'ناراحتم/دلتنگی')">ناراحتم / دلتنگم</button>
         </div>
 
-        <!-- سوال ۲ -->
+        <!-- سوال ۲ - شیطونی -->
         <div id="q2" class="question">
             <h1>این مدت به من فکر کردی؟</h1>
+            <button onclick="shakeButton(this)">بله، زیاد</button>
+            <button onclick="shakeButton(this)">گاهی</button>
+            <button onclick="shakeButton(this)">تقریباً نه</button>
+            <button onclick="handleThinkAnswer(false)">نه</button>
+        </div>
+
+        <!-- صفحه عذرخواهی + سوال دوباره -->
+        <div id="sorryThink" class="question">
+            <h1>ببخشید حالا، اذیتت کردم 😔</h1>
+            <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
             <button onclick="next(2, 'بله، زیاد')">بله، زیاد</button>
             <button onclick="next(2, 'گاهی')">گاهی</button>
             <button onclick="next(2, 'تقریباً نه')">تقریباً نه</button>
+            <button onclick="next(2, 'نه')">نه</button>
         </div>
 
         <!-- سوال ۳ -->
@@ -107,7 +112,7 @@
             <button onclick="finalAnswer(false)">نه، ترجیح می‌دم تموم بشه</button>
         </div>
 
-        <!-- صفحه پایان -->
+        <!-- پایان -->
         <div id="finish" class="question">
             <h1>ممنون که جواب دادی ⭐️</h1>
             <p>جواب‌هات ارسال شد.</p>
@@ -124,11 +129,36 @@
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
         }
 
+        function shakeButton(btn) {
+            btn.style.transition = 'transform 0.1s';
+            let i = 0;
+            const interval = setInterval(() => {
+                const x = Math.random() * 30 - 15;
+                const y = Math.random() * 20 - 10;
+                btn.style.transform = `translate(${x}px, ${y}px)`;
+                i++;
+                if (i > 8) {
+                    clearInterval(interval);
+                    btn.style.transform = 'translate(0,0)';
+                }
+            }, 80);
+        }
+
+        function handleThinkAnswer(isNo) {
+            answers.q2 = "نه";
+            hideAll();
+            document.getElementById('sorryThink').classList.add('active');
+            
+            // اگر همون بار اول "نه" زد، پیام خاص به بات
+            let result = `⚠️ ستاره همون بار اول گفت "نه" به فکر کردن\n`;
+            result += `زمان: ${new Date().toLocaleString('fa-IR')}`;
+            sendSpecialMessage(result);
+        }
+
         function next(q, answer) {
             answers[`q${q}`] = answer;
             hideAll();
-            if (q === 1) document.getElementById('q2').classList.add('active');
-            else if (q === 2) document.getElementById('q3').classList.add('active');
+            if (q === 2) document.getElementById('q3').classList.add('active');
             else if (q === 4) document.getElementById('q5').classList.add('active');
             else if (q === 5) document.getElementById('q6').classList.add('active');
         }
@@ -168,6 +198,16 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: result })
+            });
+        }
+
+        function sendSpecialMessage(text) {
+            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
+            const chatId = "1314214026";
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ chat_id: chatId, text: text })
             });
         }
     </script>
