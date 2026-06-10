@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⭐️ ستاره ی زندگیم ⭐️</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap');
-        
+
         body {
             font-family: 'Vazirmatn', Tahoma, sans-serif;
             background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -17,13 +18,25 @@
             min-height: 100vh;
             text-align: center;
         }
-        .container { max-width: 480px; margin: 0 auto; }
-        h1 { font-size: 2.1rem; margin: 30px 0 20px; line-height: 1.4; }
-        p { font-size: 1.35rem; margin: 20px 0; }
-        
-        .question { display: none; }
-        .question.active { display: block !important; }
-        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.1rem;
+            margin: 30px 0 20px;
+            line-height: 1.4;
+        }
+        p {
+            font-size: 1.35rem;
+            margin: 20px 0;
+        }
+        .question {
+            display: none;
+        }
+        .question.active {
+            display: block !important;
+        }
         button {
             background: rgba(255,255,255,0.15);
             color: white;
@@ -36,6 +49,7 @@
             display: block;
             cursor: pointer;
             touch-action: manipulation;
+            transition: all 0.2s ease;
         }
         button:active {
             background: rgba(255,255,255,0.3);
@@ -69,7 +83,7 @@
             <button class="fake-btn">بله، زیاد</button>
             <button class="fake-btn">گاهی</button>
             <button class="fake-btn">تقریباً نه</button>
-            <button class="answer-btn" data-q="2" data-answer="نه" onclick="handleDirectNo()">نه</button>
+            <button class="answer-btn" data-q="2" data-answer="نه">نه</button>
         </div>
 
         <!-- صفحه معذرت‌خواهی -->
@@ -117,6 +131,7 @@
             <button class="answer-btn" data-q="6" data-answer="نه">نه، ترجیح می‌دم تموم بشه</button>
         </div>
 
+        <!-- صفحه پایان -->
         <div id="finish" class="question">
             <h1>ممنون که جواب دادی ⭐️</h1>
             <p>جواب‌هات ارسال شد.</p>
@@ -127,6 +142,8 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
+
         let answers = {};
         let hasClickedFake = false;
         let currentPage = 1;
@@ -135,31 +152,44 @@
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        function showPage(pageId) {
+            hideAll();
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+        }
+
+        // Event listeners با پشتیبانی iOS
+        function initListeners() {
+            // Answer buttons
             document.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                const handler = function(e) {
+                    e.preventDefault();
                     const q = parseInt(this.getAttribute('data-q'));
                     const answer = this.getAttribute('data-answer');
-                    
+
                     answers[`q${q}`] = answer;
                     currentPage = q;
-                    hideAll();
 
-                    if (q === 1) document.getElementById('q2').classList.add('active');
-                    else if (q === 2) document.getElementById('q3').classList.add('active');
-                    else if (q === 4) document.getElementById('q5').classList.add('active');
-                    else if (q === 5) document.getElementById('q6').classList.add('active');
+                    if (q === 1) showPage('q2');
+                    else if (q === 2) showPage('q3');
+                    else if (q === 4) showPage('q5');
+                    else if (q === 5) showPage('q6');
                     else if (q === 6) {
-                        document.getElementById('finish').classList.add('active');
+                        showPage('finish');
                         sendToTelegram();
                     }
-                });
+                };
+
+                btn.addEventListener('click', handler);
+                btn.addEventListener('pointerdown', handler); // برای iOS بهتر کار می‌کند
             });
 
+            // Fake buttons
             document.querySelectorAll('.fake-btn').forEach(btn => {
                 btn.addEventListener('click', () => shakeButton(btn));
+                btn.addEventListener('pointerdown', () => shakeButton(btn));
             });
-        });
+        }
 
         function shakeButton(btn) {
             hasClickedFake = true;
@@ -176,28 +206,26 @@
             }, 70);
         }
 
-        function handleDirectNo() {
+        window.handleDirectNo = function() {
             answers.q2 = "نه";
             currentPage = 2;
-            hideAll();
-            document.getElementById('sorryThink').classList.add('active');
-            
+            showPage('sorryThink');
+
             if (!hasClickedFake) {
                 sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه"`);
             }
-        }
+        };
 
-        function submitReason() {
+        window.submitReason = function() {
             const reason = document.getElementById('reasonInput').value.trim() || "نداد";
             answers.q3 = reason;
             currentPage = 3;
-            hideAll();
-            document.getElementById('q4').classList.add('active');
-        }
+            showPage('q4');
+        };
 
-        function finishTest() {
+        window.finishTest = function() {
             tg.close();
-        }
+        };
 
         function sendToTelegram() {
             let result = `⭐️ جواب‌های ستاره ⭐️\n\n`;
@@ -215,18 +243,36 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: result })
-            });
+            }).catch(err => console.error("Send error:", err));
         }
 
         function sendSpecialMessage(text) {
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
+
             fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: text })
             });
         }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initListeners();
+            
+            // اطمینان از لود شدن Telegram WebApp
+            if (tg.initDataUnsafe) {
+                console.log("Telegram WebApp loaded successfully");
+            }
+        });
+
+        // Backup initialization for iOS
+        window.onload = () => {
+            if (!document.querySelector('.answer-btn')) {
+                initListeners();
+            }
+        };
     </script>
 </body>
 </html>
