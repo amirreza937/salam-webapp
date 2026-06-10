@@ -67,9 +67,9 @@
             <button onclick="handleDirectNo()">نه</button>
         </div>
 
-        <!-- صفحه معذرت‌خواهی -->
+        <!-- صفحه معذرت‌خواهی (تغییر متن) -->
         <div id="sorryThink" class="question">
-            <h1>ببخشید حالا، اذیتت کردم 😔</h1>
+            <h1>ببخشید سر سوال قبلی، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
             <button onclick="nextQuestion(2, 'بله، زیاد')">بله، زیاد</button>
             <button onclick="nextQuestion(2, 'گاهی')">گاهی</button>
@@ -120,7 +120,8 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         let answers = {};
-        let hasClickedFake = false;   // آیا گزینه تکان‌خور زده یا نه
+        let hasClickedFake = false;
+        let currentPage = 1;
 
         function hideAll() {
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
@@ -128,6 +129,7 @@
 
         function nextQuestion(q, answer) {
             answers[`q${q}`] = answer;
+            currentPage = q;
             hideAll();
             
             if (q === 1) document.getElementById('q2').classList.add('active');
@@ -137,7 +139,7 @@
         }
 
         function shakeButton(btn) {
-            hasClickedFake = true;   // مهم: علامت می‌زنیم که گزینه فیک زده
+            hasClickedFake = true;
             let i = 0;
             const interval = setInterval(() => {
                 const x = Math.random() * 40 - 20;
@@ -153,10 +155,10 @@
 
         function handleDirectNo() {
             answers.q2 = "نه";
+            currentPage = 2;
             hideAll();
             document.getElementById('sorryThink').classList.add('active');
             
-            // فقط اگر هیچ گزینه فیکی نزده باشد
             if (!hasClickedFake) {
                 let result = `⚠️ ستاره همون بار اول مستقیم گفت "نه" به فکر کردن\n`;
                 result += `زمان: ${new Date().toLocaleString('fa-IR')}`;
@@ -167,6 +169,7 @@
         function submitReason() {
             const reason = document.getElementById('reasonInput').value.trim() || "نداد";
             answers.q3 = reason;
+            currentPage = 3;
             hideAll();
             document.getElementById('q4').classList.add('active');
         }
@@ -180,17 +183,36 @@
 
         function finishTest() {
             tg.close();
-            setTimeout(() => window.close(), 500);
         }
 
+        // تأیید خروج
+        function confirmExit() {
+            if (confirm("مطمئنی می‌خوای بری؟")) {
+                if (confirm("می‌خوای جوابایی که تا حالا دادی ارسال بشه؟")) {
+                    sendToTelegram();
+                } else {
+                    let msg = `⚠️ ستاره تا صفحه ${currentPage} رفت ولی نخواست جواب‌ها ارسال بشه.\nزمان: ${new Date().toLocaleString('fa-IR')}`;
+                    sendSpecialMessage(msg);
+                }
+                tg.close();
+            }
+        }
+
+        // بستن توسط کاربر
+        tg.onEvent('viewportChanged', () => {});
+        window.addEventListener('beforeunload', (e) => {
+            confirmExit();
+        });
+
         function sendToTelegram() {
-            let result = `⭐️ جواب‌های ستاره ⭐️\n\n`;
+            let result = `⭐️ جواب‌های ستاره (ناقص یا کامل) ⭐️\n\n`;
             result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
             result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
             result += `۳. دلیل قطع ارتباط: ${answers.q3 || "نامشخص"}\n`;
             result += `۴. احساس فعلی: ${answers.q4 || "نامشخص"}\n`;
             result += `۵. رابطه مورد نظر: ${answers.q5 || "نامشخص"}\n`;
             result += `۶. نهایی: ${answers.final || "نامشخص"}\n`;
+            result += `\nصفحه‌ای که تا اونجا اومده: ${currentPage}`;
 
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
