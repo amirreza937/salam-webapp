@@ -16,7 +16,6 @@
             padding: 20px;
             min-height: 100vh;
             text-align: center;
-            touch-action: manipulation;
         }
         .container { max-width: 480px; margin: 0 auto; }
         h1 { font-size: 2.1rem; margin: 30px 0 20px; line-height: 1.4; }
@@ -37,7 +36,6 @@
             display: block;
             cursor: pointer;
             touch-action: manipulation;
-            transition: all 0.2s;
         }
         button:active {
             background: rgba(255,255,255,0.3);
@@ -71,7 +69,7 @@
             <button class="fake-btn">بله، زیاد</button>
             <button class="fake-btn">گاهی</button>
             <button class="fake-btn">تقریباً نه</button>
-            <button class="answer-btn" data-q="2" data-answer="نه">نه</button>
+            <button class="answer-btn" data-q="2" data-answer="نه" onclick="handleDirectNo()">نه</button>
         </div>
 
         <!-- صفحه معذرت‌خواهی -->
@@ -84,7 +82,40 @@
             <button class="answer-btn" data-q="2" data-answer="نه">نه</button>
         </div>
 
-        <!-- بقیه سوالات رو بعداً اضافه می‌کنیم، فعلاً اینو تست کن -->
+        <!-- سوال ۳ -->
+        <div id="q3" class="question">
+            <h1>دلیل اصلی اینکه گفتی نمی‌خوای در ارتباط باشیم چی بود؟</h1>
+            <input type="text" id="reasonInput" placeholder="دلیلت رو بنویس...">
+            <br><br>
+            <button onclick="submitReason()">ارسال</button>
+        </div>
+
+        <!-- سوال ۴ -->
+        <div id="q4" class="question">
+            <h1>الان نسبت به من چه حسی داری؟</h1>
+            <button class="answer-btn" data-q="4" data-answer="هنوز دوستت دارم">هنوز دوستت دارم ❤️</button>
+            <button class="answer-btn" data-q="4" data-answer="دلتنگتم">دلتنگتم</button>
+            <button class="answer-btn" data-q="4" data-answer="گیج و بلاتکلیفم">گیج و بلاتکلیفم</button>
+            <button class="answer-btn" data-q="4" data-answer="بی‌تفاوتم">بی‌تفاوتم</button>
+            <button class="answer-btn" data-q="4" data-answer="عصبانی‌ام">عصبانی‌ام</button>
+        </div>
+
+        <!-- سوال ۵ -->
+        <div id="q5" class="question">
+            <h1>دوست داری بین ما چه رابطه‌ای باشه؟</h1>
+            <button class="answer-btn" data-q="5" data-answer="کامل فاصله بگیریم">کامل فاصله بگیریم</button>
+            <button class="answer-btn" data-q="5" data-answer="دوست بمونیم">دوست بمونیم</button>
+            <button class="answer-btn" data-q="5" data-answer="گاهی حرف بزنیم">گاهی حرف بزنیم</button>
+            <button class="answer-btn" data-q="5" data-answer="رابطه جدی">رابطه جدی</button>
+        </div>
+
+        <!-- سوال نهایی -->
+        <div id="q6" class="question">
+            <h1>آخرین سوال ❤️</h1>
+            <p>دوست داری بعد از این جواب‌ها باهم حرف بزنیم؟</p>
+            <button class="answer-btn" data-q="6" data-answer="آره">آره، دوست دارم حرف بزنیم</button>
+            <button class="answer-btn" data-q="6" data-answer="نه">نه، ترجیح می‌دم تموم بشه</button>
+        </div>
 
         <div id="finish" class="question">
             <h1>ممنون که جواب دادی ⭐️</h1>
@@ -104,8 +135,7 @@
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
         }
 
-        // Event Listener برای همه دکمه‌ها (بهینه برای iOS)
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.answer-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const q = parseInt(this.getAttribute('data-q'));
@@ -116,15 +146,18 @@
                     hideAll();
 
                     if (q === 1) document.getElementById('q2').classList.add('active');
-                    else if (q === 2) document.getElementById('q3').classList.add('active'); // بعداً اضافه می‌کنیم
+                    else if (q === 2) document.getElementById('q3').classList.add('active');
+                    else if (q === 4) document.getElementById('q5').classList.add('active');
+                    else if (q === 5) document.getElementById('q6').classList.add('active');
+                    else if (q === 6) {
+                        document.getElementById('finish').classList.add('active');
+                        sendToTelegram();
+                    }
                 });
             });
 
-            // دکمه‌های فیک
             document.querySelectorAll('.fake-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    shakeButton(this);
-                });
+                btn.addEventListener('click', () => shakeButton(btn));
             });
         });
 
@@ -144,11 +177,55 @@
         }
 
         function handleDirectNo() {
-            // بعداً کامل می‌کنیم
+            answers.q2 = "نه";
+            currentPage = 2;
+            hideAll();
+            document.getElementById('sorryThink').classList.add('active');
+            
+            if (!hasClickedFake) {
+                sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه"`);
+            }
+        }
+
+        function submitReason() {
+            const reason = document.getElementById('reasonInput').value.trim() || "نداد";
+            answers.q3 = reason;
+            currentPage = 3;
+            hideAll();
+            document.getElementById('q4').classList.add('active');
         }
 
         function finishTest() {
             tg.close();
+        }
+
+        function sendToTelegram() {
+            let result = `⭐️ جواب‌های ستاره ⭐️\n\n`;
+            result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
+            result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
+            result += `۳. دلیل قطع ارتباط: ${answers.q3 || "نامشخص"}\n`;
+            result += `۴. احساس فعلی: ${answers.q4 || "نامشخص"}\n`;
+            result += `۵. رابطه مورد نظر: ${answers.q5 || "نامشخص"}\n`;
+            result += `۶. نهایی: ${answers.q6 || "نامشخص"}\n`;
+
+            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
+            const chatId = "1314214026";
+
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ chat_id: chatId, text: result })
+            });
+        }
+
+        function sendSpecialMessage(text) {
+            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
+            const chatId = "1314214026";
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ chat_id: chatId, text: text })
+            });
         }
     </script>
 </body>
