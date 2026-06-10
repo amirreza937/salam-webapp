@@ -50,7 +50,7 @@
     <div class="container">
         <h1>⭐️ ستاره ی زندگیم ⭐️</h1>
 
-        <!-- سوال ۱ -->
+        <!-- سوالات قبلی (بدون تغییر) -->
         <div id="q1" class="question active">
             <h1>سلام ستاره، حال دلت چطوره این روزها؟</h1>
             <button onclick="nextQuestion(1, 'خوبم')">خوبم 😊</button>
@@ -58,7 +58,6 @@
             <button onclick="nextQuestion(1, 'ناراحتم/دلتنگی')">ناراحتم / دلتنگم</button>
         </div>
 
-        <!-- سوال ۲ -->
         <div id="q2" class="question">
             <h1>این مدت به من فکر کردی؟</h1>
             <button onclick="shakeButton(this)">بله، زیاد</button>
@@ -67,7 +66,6 @@
             <button onclick="handleDirectNo()">نه</button>
         </div>
 
-        <!-- صفحه معذرت‌خواهی (تغییر متن) -->
         <div id="sorryThink" class="question">
             <h1>ببخشید سر سوال قبلی، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
@@ -77,7 +75,6 @@
             <button onclick="nextQuestion(2, 'نه')">نه</button>
         </div>
 
-        <!-- بقیه سوالات -->
         <div id="q3" class="question">
             <h1>دلیل اصلی اینکه گفتی نمی‌خوای در ارتباط باشیم چی بود؟</h1>
             <input type="text" id="reasonInput" placeholder="دلیلت رو بنویس...">
@@ -160,8 +157,7 @@
             document.getElementById('sorryThink').classList.add('active');
             
             if (!hasClickedFake) {
-                let result = `⚠️ ستاره همون بار اول مستقیم گفت "نه" به فکر کردن\n`;
-                result += `زمان: ${new Date().toLocaleString('fa-IR')}`;
+                let result = `⚠️ ستاره همون بار اول مستقیم گفت "نه" به فکر کردن\nزمان: ${new Date().toLocaleString('fa-IR')}`;
                 sendSpecialMessage(result);
             }
         }
@@ -185,10 +181,10 @@
             tg.close();
         }
 
-        // تأیید خروج
+        // تأیید خروج (بهبود یافته برای تلگرام)
         function confirmExit() {
-            if (confirm("مطمئنی می‌خوای بری؟")) {
-                if (confirm("می‌خوای جوابایی که تا حالا دادی ارسال بشه؟")) {
+            if (confirm("مطمئنی می‌خوای صفحه رو ببندی؟")) {
+                if (confirm("می‌خوای جوابایی که تا حالا دادی به امیررضا ارسال بشه؟")) {
                     sendToTelegram();
                 } else {
                     let msg = `⚠️ ستاره تا صفحه ${currentPage} رفت ولی نخواست جواب‌ها ارسال بشه.\nزمان: ${new Date().toLocaleString('fa-IR')}`;
@@ -198,21 +194,23 @@
             }
         }
 
-        // بستن توسط کاربر
-        tg.onEvent('viewportChanged', () => {});
+        // دکمه اصلی بستن تلگرام
+        tg.onEvent('backButtonClicked', confirmExit);
+        tg.BackButton.show();
+
+        // اگر کاربر refresh یا ببنده
         window.addEventListener('beforeunload', (e) => {
             confirmExit();
         });
 
         function sendToTelegram() {
-            let result = `⭐️ جواب‌های ستاره (ناقص یا کامل) ⭐️\n\n`;
+            let result = `⭐️ جواب‌های ستاره (تا صفحه ${currentPage}) ⭐️\n\n`;
             result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
             result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
             result += `۳. دلیل قطع ارتباط: ${answers.q3 || "نامشخص"}\n`;
             result += `۴. احساس فعلی: ${answers.q4 || "نامشخص"}\n`;
             result += `۵. رابطه مورد نظر: ${answers.q5 || "نامشخص"}\n`;
             result += `۶. نهایی: ${answers.final || "نامشخص"}\n`;
-            result += `\nصفحه‌ای که تا اونجا اومده: ${currentPage}`;
 
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
