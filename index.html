@@ -53,9 +53,9 @@
         <!-- سوال ۱ -->
         <div id="q1" class="question active">
             <h1>سلام ستاره، حال دلت چطوره این روزها؟</h1>
-            <button onclick="next(1, 'خوبم')">خوبم 😊</button>
-            <button onclick="next(1, 'متوسطم')">متوسطم</button>
-            <button onclick="next(1, 'ناراحتم/دلتنگی')">ناراحتم / دلتنگم</button>
+            <button onclick="nextQuestion(1, 'خوبم')">خوبم 😊</button>
+            <button onclick="nextQuestion(1, 'متوسطم')">متوسطم</button>
+            <button onclick="nextQuestion(1, 'ناراحتم/دلتنگی')">ناراحتم / دلتنگم</button>
         </div>
 
         <!-- سوال ۲ - شیطونی -->
@@ -64,17 +64,17 @@
             <button onclick="shakeButton(this)">بله، زیاد</button>
             <button onclick="shakeButton(this)">گاهی</button>
             <button onclick="shakeButton(this)">تقریباً نه</button>
-            <button onclick="handleThinkAnswer(false)">نه</button>
+            <button onclick="handleNoThink()">نه</button>
         </div>
 
         <!-- صفحه عذرخواهی + سوال دوباره -->
         <div id="sorryThink" class="question">
             <h1>ببخشید حالا، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
-            <button onclick="next(2, 'بله، زیاد')">بله، زیاد</button>
-            <button onclick="next(2, 'گاهی')">گاهی</button>
-            <button onclick="next(2, 'تقریباً نه')">تقریباً نه</button>
-            <button onclick="next(2, 'نه')">نه</button>
+            <button onclick="nextQuestion(2, 'بله، زیاد')">بله، زیاد</button>
+            <button onclick="nextQuestion(2, 'گاهی')">گاهی</button>
+            <button onclick="nextQuestion(2, 'تقریباً نه')">تقریباً نه</button>
+            <button onclick="nextQuestion(2, 'نه')">نه</button>
         </div>
 
         <!-- سوال ۳ -->
@@ -88,20 +88,20 @@
         <!-- سوال ۴ -->
         <div id="q4" class="question">
             <h1>الان نسبت به من چه حسی داری؟</h1>
-            <button onclick="next(4, 'هنوز دوستت دارم')">هنوز دوستت دارم ❤️</button>
-            <button onclick="next(4, 'دلتنگتم')">دلتنگتم</button>
-            <button onclick="next(4, 'گیج و بلاتکلیفم')">گیج و بلاتکلیفم</button>
-            <button onclick="next(4, 'بی‌تفاوتم')">بی‌تفاوتم</button>
-            <button onclick="next(4, 'عصبانی‌ام')">عصبانی‌ام</button>
+            <button onclick="nextQuestion(4, 'هنوز دوستت دارم')">هنوز دوستت دارم ❤️</button>
+            <button onclick="nextQuestion(4, 'دلتنگتم')">دلتنگتم</button>
+            <button onclick="nextQuestion(4, 'گیج و بلاتکلیفم')">گیج و بلاتکلیفم</button>
+            <button onclick="nextQuestion(4, 'بی‌تفاوتم')">بی‌تفاوتم</button>
+            <button onclick="nextQuestion(4, 'عصبانی‌ام')">عصبانی‌ام</button>
         </div>
 
         <!-- سوال ۵ -->
         <div id="q5" class="question">
             <h1>دوست داری بین ما چه رابطه‌ای باشه؟</h1>
-            <button onclick="next(5, 'کامل فاصله بگیریم')">کامل فاصله بگیریم</button>
-            <button onclick="next(5, 'دوست بمونیم')">دوست بمونیم</button>
-            <button onclick="next(5, 'گاهی حرف بزنیم')">گاهی حرف بزنیم</button>
-            <button onclick="next(5, 'رابطه جدی')">رابطه جدی</button>
+            <button onclick="nextQuestion(5, 'کامل فاصله بگیریم')">کامل فاصله بگیریم</button>
+            <button onclick="nextQuestion(5, 'دوست بمونیم')">دوست بمونیم</button>
+            <button onclick="nextQuestion(5, 'گاهی حرف بزنیم')">گاهی حرف بزنیم</button>
+            <button onclick="nextQuestion(5, 'رابطه جدی')">رابطه جدی</button>
         </div>
 
         <!-- سوال نهایی -->
@@ -129,38 +129,39 @@
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
         }
 
-        function shakeButton(btn) {
-            btn.style.transition = 'transform 0.1s';
-            let i = 0;
-            const interval = setInterval(() => {
-                const x = Math.random() * 30 - 15;
-                const y = Math.random() * 20 - 10;
-                btn.style.transform = `translate(${x}px, ${y}px)`;
-                i++;
-                if (i > 8) {
-                    clearInterval(interval);
-                    btn.style.transform = 'translate(0,0)';
-                }
-            }, 80);
+        function nextQuestion(q, answer) {
+            answers[`q${q}`] = answer;
+            hideAll();
+            
+            if (q === 1) document.getElementById('q2').classList.add('active');
+            else if (q === 2) document.getElementById('q3').classList.add('active');
+            else if (q === 4) document.getElementById('q5').classList.add('active');
+            else if (q === 5) document.getElementById('q6').classList.add('active');
         }
 
-        function handleThinkAnswer(isNo) {
+        function shakeButton(btn) {
+            let i = 0;
+            const interval = setInterval(() => {
+                const x = Math.random() * 40 - 20;
+                const y = Math.random() * 30 - 15;
+                btn.style.transform = `translate(${x}px, ${y}px)`;
+                i++;
+                if (i > 10) {
+                    clearInterval(interval);
+                    btn.style.transform = '';
+                }
+            }, 70);
+        }
+
+        function handleNoThink() {
             answers.q2 = "نه";
             hideAll();
             document.getElementById('sorryThink').classList.add('active');
             
-            // اگر همون بار اول "نه" زد، پیام خاص به بات
+            // پیام خاص به بات اگر بار اول "نه" زد
             let result = `⚠️ ستاره همون بار اول گفت "نه" به فکر کردن\n`;
             result += `زمان: ${new Date().toLocaleString('fa-IR')}`;
             sendSpecialMessage(result);
-        }
-
-        function next(q, answer) {
-            answers[`q${q}`] = answer;
-            hideAll();
-            if (q === 2) document.getElementById('q3').classList.add('active');
-            else if (q === 4) document.getElementById('q5').classList.add('active');
-            else if (q === 5) document.getElementById('q6').classList.add('active');
         }
 
         function submitReason() {
