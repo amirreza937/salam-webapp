@@ -30,13 +30,11 @@
             display: block;
         }
         button:active { transform: scale(0.95); background: rgba(255,255,255,0.45) !important; }
-        #debug { color: yellow; font-size: 16px; margin: 15px 0; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
     <div>
         <h1>⭐️ ستاره ی زندگیم ⭐️</h1>
-        <div id="debug">در حال بارگذاری...</div>
 
         <!-- سوال ۱ -->
         <div id="q1">
@@ -86,22 +84,14 @@
         let answers = {};
         let hasClickedFake = false;
 
-        function log(msg) {
-            const debug = document.getElementById('debug');
-            debug.innerHTML += "<br>" + msg;
-            console.log(msg);
-        }
-
         function answerQ1(ans) {
             answers.q1 = ans;
-            log("✅ سوال ۱ جواب داده شد: " + ans);
             document.getElementById('q1').style.display = 'none';
             document.getElementById('q2').style.display = 'block';
         }
 
         function shake(btn) {
             hasClickedFake = true;
-            log("فیک کلیک شد");
             let i = 0;
             const int = setInterval(() => {
                 const x = Math.random() * 40 - 20;
@@ -116,19 +106,16 @@
 
         function directNo() {
             answers.q2 = "نه";
-            log("🔴 دکمه «نه» مستقیم زده شد");
             document.getElementById('q2').style.display = 'none';
             document.getElementById('sorry').style.display = 'block';
             
             if (!hasClickedFake) {
-                log("⚠️ ارسال آلرت خاص...");
                 sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه"`);
             }
         }
 
         function finishWithAnswer(ans) {
             answers.q2 = ans;
-            log("✅ جواب نهایی: " + ans);
             document.getElementById('sorry').style.display = 'none';
             document.getElementById('finish').style.display = 'block';
             sendToTelegram();
@@ -139,8 +126,6 @@
             result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
             result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
 
-            log("📤 در حال ارسال جواب‌ها...");
-
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
 
@@ -148,42 +133,22 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: result })
-            })
-            .then(r => r.json())
-            .then(data => log("✅ جواب‌ها با موفقیت ارسال شد"))
-            .catch(err => {
-                log("❌ خطا در ارسال جواب: " + err.message);
-                // فال‌بک: سعی دوباره
-                setTimeout(() => {
-                    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ chat_id: chatId, text: result })
-                    });
-                }, 1000);
             });
         }
 
         function sendSpecialMessage(text) {
-            log("📤 ارسال آلرت: " + text);
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
-
             fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: text })
-            })
-            .then(() => log("✅ آلرت ارسال شد"))
-            .catch(err => log("❌ خطا در آلرت: " + err.message));
+            });
         }
 
         function finishTest() {
             if (tg) tg.close();
         }
-
-        // نمایش اولیه
-        window.onload = () => log("✅ صفحه آماده شد - تست کن");
     </script>
 </body>
 </html>
