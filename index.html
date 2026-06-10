@@ -64,7 +64,7 @@
             <button onclick="shakeButton(this)">بله، زیاد</button>
             <button onclick="shakeButton(this)">گاهی</button>
             <button onclick="shakeButton(this)">تقریباً نه</button>
-            <button onclick="handleNoThink()">نه</button>
+            <button onclick="handleNoThink(true)">نه</button>
         </div>
 
         <!-- صفحه عذرخواهی + سوال دوباره -->
@@ -77,7 +77,7 @@
             <button onclick="nextQuestion(2, 'نه')">نه</button>
         </div>
 
-        <!-- سوال ۳ -->
+        <!-- بقیه سوالات مثل قبل -->
         <div id="q3" class="question">
             <h1>دلیل اصلی اینکه گفتی نمی‌خوای در ارتباط باشیم چی بود؟</h1>
             <input type="text" id="reasonInput" placeholder="دلیلت رو بنویس...">
@@ -85,7 +85,6 @@
             <button onclick="submitReason()">ارسال</button>
         </div>
 
-        <!-- سوال ۴ -->
         <div id="q4" class="question">
             <h1>الان نسبت به من چه حسی داری؟</h1>
             <button onclick="nextQuestion(4, 'هنوز دوستت دارم')">هنوز دوستت دارم ❤️</button>
@@ -95,7 +94,6 @@
             <button onclick="nextQuestion(4, 'عصبانی‌ام')">عصبانی‌ام</button>
         </div>
 
-        <!-- سوال ۵ -->
         <div id="q5" class="question">
             <h1>دوست داری بین ما چه رابطه‌ای باشه؟</h1>
             <button onclick="nextQuestion(5, 'کامل فاصله بگیریم')">کامل فاصله بگیریم</button>
@@ -104,7 +102,6 @@
             <button onclick="nextQuestion(5, 'رابطه جدی')">رابطه جدی</button>
         </div>
 
-        <!-- سوال نهایی -->
         <div id="q6" class="question">
             <h1>آخرین سوال ❤️</h1>
             <p>دوست داری بعد از این جواب‌ها باهم حرف بزنیم؟</p>
@@ -112,7 +109,6 @@
             <button onclick="finalAnswer(false)">نه، ترجیح می‌دم تموم بشه</button>
         </div>
 
-        <!-- پایان -->
         <div id="finish" class="question">
             <h1>ممنون که جواب دادی ⭐️</h1>
             <p>جواب‌هات ارسال شد.</p>
@@ -124,6 +120,7 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         let answers = {};
+        let firstNoClick = false;   // برای تشخیص کلیک مستقیم روی "نه"
 
         function hideAll() {
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
@@ -153,13 +150,15 @@
             }, 70);
         }
 
-        function handleNoThink() {
+        // وقتی مستقیم روی "نه" کلیک می‌کنه
+        function handleNoThink(isFirst) {
+            firstNoClick = true;
             answers.q2 = "نه";
             hideAll();
             document.getElementById('sorryThink').classList.add('active');
             
-            // پیام خاص به بات اگر بار اول "نه" زد
-            let result = `⚠️ ستاره همون بار اول گفت "نه" به فکر کردن\n`;
+            // پیام خاص به بات
+            let result = `⚠️ ستاره همون بار اول مستقیم گفت "نه" به فکر کردن\n`;
             result += `زمان: ${new Date().toLocaleString('fa-IR')}`;
             sendSpecialMessage(result);
         }
