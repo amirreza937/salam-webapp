@@ -35,6 +35,7 @@
             width: 85%;
             display: block;
             cursor: pointer;
+            touch-action: manipulation;
         }
         button:active {
             background: rgba(255,255,255,0.4) !important;
@@ -48,13 +49,11 @@
             border: none;
             font-size: 1.1rem;
         }
-        .debug { color: #ffff00; font-size: 1rem; margin: 10px 0; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>⭐️ ستاره ی زندگیم ⭐️</h1>
-        <div class="debug" id="debug">در حال بارگذاری...</div>
 
         <!-- سوال ۱ -->
         <div id="q1" class="question active">
@@ -198,7 +197,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: result })
-            });
+            }).then(() => console.log("ارسال شد")).catch(() => {});
         }
 
         function sendSpecialMessage(text) {
@@ -212,8 +211,6 @@
         }
 
         function init() {
-            document.getElementById('debug').textContent = "✅ آماده شد";
-
             document.querySelectorAll('.answer-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const q = parseInt(this.getAttribute('data-q'));
