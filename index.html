@@ -9,33 +9,29 @@
     <style>
         body {
             font-family: Tahoma, Arial, sans-serif;
-            background: linear-gradient(135deg, #6a11cb, #2575fc) !important;
-            background-color: #2575fc !important;
+            background: #2575fc !important;
             color: white;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
             text-align: center;
         }
-        .container { max-width: 480px; margin: 0 auto; }
-        h1 { font-size: 28px; margin: 25px 0 20px; }
-        p { font-size: 20px; margin: 20px 0; }
+        h1 { font-size: 28px; margin: 30px 0 25px; }
         button {
             background: rgba(255,255,255,0.25) !important;
             color: white !important;
-            border: 2px solid rgba(255,255,255,0.6) !important;
-            padding: 18px 25px;
+            border: 2px solid white !important;
+            padding: 20px;
             margin: 12px auto;
             border-radius: 20px;
             font-size: 20px;
             width: 85%;
             display: block;
         }
-        button:active { transform: scale(0.95); background: rgba(255,255,255,0.45) !important; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div>
         <h1>⭐️ ستاره ی زندگیم ⭐️</h1>
 
         <!-- سوال ۱ -->
@@ -47,26 +43,26 @@
         </div>
 
         <!-- سوال ۲ -->
-        <div id="q2" style="display:none;">
+        <div id="q2" style="display:none">
             <h1>این مدت به من فکر کردی؟</h1>
-            <button class="fake" onclick="shake(this)">بله، زیاد</button>
-            <button class="fake" onclick="shake(this)">گاهی</button>
-            <button class="fake" onclick="shake(this)">تقریباً نه</button>
+            <button onclick="shake(this)">بله، زیاد</button>
+            <button onclick="shake(this)">گاهی</button>
+            <button onclick="shake(this)">تقریباً نه</button>
             <button onclick="directNo()">نه</button>
         </div>
 
         <!-- صفحه معذرت‌خواهی -->
-        <div id="sorry" style="display:none;">
+        <div id="sorry" style="display:none">
             <h1>ببخشید سر سوال قبلی، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
-            <button onclick="answerReal('بله، زیاد')">بله، زیاد</button>
-            <button onclick="answerReal('گاهی')">گاهی</button>
-            <button onclick="answerReal('تقریباً نه')">تقریباً نه</button>
-            <button onclick="answerReal('نه')">نه</button>
+            <button onclick="finishWithAnswer('بله، زیاد')">بله، زیاد</button>
+            <button onclick="finishWithAnswer('گاهی')">گاهی</button>
+            <button onclick="finishWithAnswer('تقریباً نه')">تقریباً نه</button>
+            <button onclick="finishWithAnswer('نه')">نه</button>
         </div>
 
         <!-- پایان -->
-        <div id="finish" style="display:none;">
+        <div id="finish" style="display:none">
             <h1>ممنون که جواب دادی ⭐️</h1>
             <p>جواب‌هات ارسال شد.</p>
             <button onclick="finishTest()">بستن</button>
@@ -75,7 +71,13 @@
 
     <script>
         let tg = null;
-        try { tg = window.Telegram.WebApp; if(tg) { tg.expand(); tg.ready(); } } catch(e){}
+        try {
+            tg = window.Telegram.WebApp;
+            if (tg) {
+                tg.expand();
+                tg.ready();
+            }
+        } catch(e) {}
 
         let answers = {};
         let hasClickedFake = false;
@@ -93,7 +95,10 @@
                 const x = Math.random() * 40 - 20;
                 btn.style.transform = `translate(${x}px, ${Math.random()*20-10}px)`;
                 i++;
-                if (i > 12) { clearInterval(int); btn.style.transform = ''; }
+                if (i > 12) {
+                    clearInterval(int);
+                    btn.style.transform = '';
+                }
             }, 70);
         }
 
@@ -102,12 +107,13 @@
             document.getElementById('q2').style.display = 'none';
             document.getElementById('sorry').style.display = 'block';
             
+            // آلرت خاص فقط اگر فیک نزده باشه
             if (!hasClickedFake && tg) {
                 sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه"`);
             }
         }
 
-        function answerReal(ans) {
+        function finishWithAnswer(ans) {
             answers.q2 = ans;
             document.getElementById('sorry').style.display = 'none';
             document.getElementById('finish').style.display = 'block';
@@ -115,10 +121,8 @@
         }
 
         function sendToTelegram() {
-            let result = `⭐️ جواب‌های ستاره ⭐️\n\n`;
-            result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
-            result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
-
+            let result = `⭐️ جواب‌های ستاره ⭐️\n\n1. حالش: ${answers.q1 || "نامشخص"}\n2. به من فکر کرده: ${answers.q2 || "نامشخص"}`;
+            
             const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
             const chatId = "1314214026";
 
