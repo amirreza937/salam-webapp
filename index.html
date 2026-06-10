@@ -50,7 +50,7 @@
     <div class="container">
         <h1>⭐️ ستاره ی زندگیم ⭐️</h1>
 
-        <!-- سوالات قبلی (بدون تغییر) -->
+        <!-- سوالات -->
         <div id="q1" class="question active">
             <h1>سلام ستاره، حال دلت چطوره این روزها؟</h1>
             <button onclick="nextQuestion(1, 'خوبم')">خوبم 😊</button>
@@ -181,24 +181,26 @@
             tg.close();
         }
 
-        // تأیید خروج (بهبود یافته برای تلگرام)
+        // ==================== تأیید خروج ====================
         function confirmExit() {
-            if (confirm("مطمئنی می‌خوای صفحه رو ببندی؟")) {
-                if (confirm("می‌خوای جوابایی که تا حالا دادی به امیررضا ارسال بشه؟")) {
+            if (currentPage >= 6) return; // صفحه آخر نیازی به تأیید ندارد
+
+            if (confirm("مطمئنی می‌خوای بری؟")) {
+                if (confirm("جوابایی که تا اینجا دادی رو برای امیررضا ارسال کنم؟")) {
                     sendToTelegram();
                 } else {
-                    let msg = `⚠️ ستاره تا صفحه ${currentPage} رفت ولی نخواست جواب‌ها ارسال بشه.\nزمان: ${new Date().toLocaleString('fa-IR')}`;
+                    let msg = `⚠️ ستاره میخواست بره بیرون و جوابا رو نمیخواست بده.\nتا صفحه ${currentPage} جواب داده بود.\nزمان: ${new Date().toLocaleString('fa-IR')}`;
                     sendSpecialMessage(msg);
                 }
                 tg.close();
             }
         }
 
-        // دکمه اصلی بستن تلگرام
-        tg.onEvent('backButtonClicked', confirmExit);
+        // دکمه Back تلگرام
         tg.BackButton.show();
+        tg.onEvent('backButtonClicked', confirmExit);
 
-        // اگر کاربر refresh یا ببنده
+        // اگر کاربر refresh یا تب رو ببنده
         window.addEventListener('beforeunload', (e) => {
             confirmExit();
         });
