@@ -9,6 +9,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap');
 
+        * { box-sizing: border-box; }
         body {
             font-family: 'Vazirmatn', Tahoma, sans-serif;
             background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -17,12 +18,14 @@
             padding: 20px;
             min-height: 100vh;
             text-align: center;
+            opacity: 1 !important;
         }
         .container { max-width: 480px; margin: 0 auto; }
         h1 { font-size: 2.1rem; margin: 30px 0 20px; line-height: 1.4; }
         p { font-size: 1.35rem; margin: 20px 0; }
         .question { display: none; }
         .question.active { display: block !important; }
+        
         button {
             background: rgba(255,255,255,0.15);
             color: white;
@@ -49,6 +52,9 @@
             border: none;
             font-size: 1.1rem;
         }
+
+        /* فید این برای جلوگیری از سفید شدن لحظه‌ای */
+        .loading { display: none; }
     </style>
 </head>
 <body>
@@ -63,7 +69,7 @@
             <button class="answer-btn" data-q="1" data-answer="ناراحتم/دلتنگی">ناراحتم / دلتنگم</button>
         </div>
 
-        <!-- سوال ۲ (فقط دکمه "نه" کار می‌کند) -->
+        <!-- سوال ۲ -->
         <div id="q2" class="question">
             <h1>این مدت به من فکر کردی؟</h1>
             <button class="fake-btn">بله، زیاد</button>
@@ -72,7 +78,7 @@
             <button class="answer-btn" id="directNoBtn" data-q="2" data-answer="نه">نه</button>
         </div>
 
-        <!-- صفحه معذرت‌خواهی + تکرار سوال -->
+        <!-- صفحه معذرت‌خواهی -->
         <div id="sorryThink" class="question">
             <h1>ببخشید سر سوال قبلی، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
@@ -109,7 +115,7 @@
             <button class="answer-btn" data-q="5" data-answer="رابطه جدی">رابطه جدی</button>
         </div>
 
-        <!-- سوال نهایی -->
+        <!-- سوال ۶ -->
         <div id="q6" class="question">
             <h1>آخرین سوال ❤️</h1>
             <p>دوست داری بعد از این جواب‌ها باهم حرف بزنیم؟</p>
@@ -126,9 +132,15 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+        // Telegram WebApp
+        let tg;
+        try {
+            tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.ready();
+        } catch(e) {
+            console.log("Telegram WebApp not available");
+        }
 
         let answers = {};
         let hasClickedFake = false;
@@ -137,12 +149,12 @@
             document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
         }
 
-        function showPage(pageId) {
+        function showPage(id) {
             hideAll();
-            document.getElementById(pageId).classList.add('active');
+            const page = document.getElementById(id);
+            if (page) page.classList.add('active');
         }
 
-        // انیمیشن تکان خوردن دکمه‌های فیک
         function shakeButton(btn) {
             hasClickedFake = true;
             let i = 0;
@@ -158,14 +170,10 @@
             }, 70);
         }
 
-        // هندل کردن دکمه "نه" مستقیم در سوال دوم
         function handleDirectNo() {
             answers.q2 = "نه";
-            
             showPage('sorryThink');
-
-            // فقط اگر هیچ دکمه فیکی نزده باشد، پیام آلرت بفرست
-            if (!hasClickedFake) {
+            if (!hasClickedFake && tg) {
                 sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه"`);
             }
         }
@@ -177,7 +185,7 @@
         };
 
         window.finishTest = function() {
-            tg.close();
+            if (tg) tg.close();
         };
 
         function sendToTelegram() {
@@ -196,7 +204,7 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: result })
-            });
+            }).catch(() => {});
         }
 
         function sendSpecialMessage(text) {
@@ -206,60 +214,51 @@
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ chat_id: chatId, text: text })
-            });
+            }).catch(() => {});
         }
 
-        // راه‌اندازی همه دکمه‌ها
-        function initListeners() {
-            // دکمه‌های معمولی
+        function init() {
+            // Answer buttons
             document.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
+                const handler = function() {
                     const q = parseInt(this.getAttribute('data-q'));
                     const answer = this.getAttribute('data-answer');
-
                     answers[`q${q}`] = answer;
 
-                    if (q === 1) {
-                        showPage('q2');
-                    } 
-                    else if (q === 2 && this.id !== 'directNoBtn') {
-                        // دکمه‌های واقعی در صفحه معذرت‌خواهی
-                        showPage('q3');
-                    } 
-                    else if (q === 4) {
-                        showPage('q5');
-                    } 
-                    else if (q === 5) {
-                        showPage('q6');
-                    } 
+                    if (q === 1) showPage('q2');
+                    else if (q === 2) {
+                        if (this.id === 'directNoBtn') {
+                            handleDirectNo();
+                        } else {
+                            showPage('q3');   // از صفحه معذرت‌خواهی
+                        }
+                    }
+                    else if (q === 4) showPage('q5');
+                    else if (q === 5) showPage('q6');
                     else if (q === 6) {
                         showPage('finish');
                         sendToTelegram();
                     }
-                });
+                };
+
+                btn.addEventListener('click', handler);
+                btn.addEventListener('pointerdown', handler); // مهم برای iOS
             });
 
-            // دکمه‌های فیک (فقط لرزش)
+            // Fake buttons
             document.querySelectorAll('.fake-btn').forEach(btn => {
                 btn.addEventListener('click', () => shakeButton(btn));
+                btn.addEventListener('pointerdown', () => shakeButton(btn));
             });
 
-            // دکمه "نه" مستقیم سوال دوم
-            const directNoBtn = document.getElementById('directNoBtn');
-            if (directNoBtn) {
-                directNoBtn.addEventListener('click', handleDirectNo);
-            }
+            // دکمه نه مستقیم
+            const directNo = document.getElementById('directNoBtn');
+            if (directNo) directNo.addEventListener('click', handleDirectNo);
         }
 
-        // شروع برنامه
-        document.addEventListener('DOMContentLoaded', () => {
-            initListeners();
-        });
-
-        window.onload = () => {
-            if (document.querySelectorAll('.answer-btn').length === 0) initListeners();
-        };
+        // شروع با اطمینان کامل
+        document.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
