@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⭐️ ستاره ی زندگیم ⭐️</title>
-    <script src="https://telegram.org/js/telegram-web-app.js" async defer></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700&display=swap');
-        
         body {
-            font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
-            background: linear-gradient(135deg, #6a11cb, #2575fc) !important;
-            background-color: #2575fc !important; /* فال‌بک رنگ آبی */
+            font-family: Tahoma, Arial, sans-serif;
+            background-color: #2575fc !important;
             color: white;
             margin: 0;
             padding: 20px;
@@ -20,42 +16,24 @@
             text-align: center;
         }
         .container { max-width: 480px; margin: 0 auto; }
-        h1 { font-size: 2.1rem; margin: 30px 0 20px; line-height: 1.4; }
-        p { font-size: 1.35rem; margin: 20px 0; }
-        .question { display: none; }
-        .question.active { display: block !important; }
+        h1 { font-size: 28px; margin: 30px 0 20px; }
         button {
-            background: rgba(255,255,255,0.2) !important;
-            color: white !important;
-            border: 2px solid rgba(255,255,255,0.5) !important;
-            padding: 18px 25px;
-            margin: 12px auto;
+            background: rgba(255,255,255,0.25);
+            color: white;
+            border: 2px solid white;
+            padding: 18px;
+            margin: 10px auto;
             border-radius: 20px;
-            font-size: 1.25rem;
+            font-size: 18px;
             width: 85%;
             display: block;
-            cursor: pointer;
-            touch-action: manipulation;
-        }
-        button:active {
-            background: rgba(255,255,255,0.4) !important;
-            transform: scale(0.95);
-        }
-        input {
-            width: 80%;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 15px;
-            border: none;
-            font-size: 1.1rem;
         }
         .debug { 
-            color: #ffff00; 
-            font-size: 1rem; 
-            margin: 10px 0; 
-            background: rgba(0,0,0,0.4);
-            padding: 8px;
-            border-radius: 8px;
+            color: yellow; 
+            background: rgba(0,0,0,0.5); 
+            padding: 10px; 
+            margin: 10px 0;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -65,190 +43,76 @@
         <div class="debug" id="debug">در حال بارگذاری...</div>
 
         <!-- سوال ۱ -->
-        <div id="q1" class="question active">
+        <div id="q1">
             <h1>سلام ستاره، حال دلت چطوره این روزها؟</h1>
-            <button class="answer-btn" data-q="1" data-answer="خوبم">خوبم 😊</button>
-            <button class="answer-btn" data-q="1" data-answer="متوسطم">متوسطم</button>
-            <button class="answer-btn" data-q="1" data-answer="ناراحتم/دلتنگی">ناراحتم / دلتنگم</button>
+            <button onclick="goToQ2('خوبم')">خوبم 😊</button>
+            <button onclick="goToQ2('متوسطم')">متوسطم</button>
+            <button onclick="goToQ2('ناراحتم/دلتنگی')">ناراحتم / دلتنگم</button>
         </div>
 
         <!-- سوال ۲ -->
-        <div id="q2" class="question">
+        <div id="q2" style="display: none;">
             <h1>این مدت به من فکر کردی؟</h1>
-            <button class="fake-btn">بله، زیاد</button>
-            <button class="fake-btn">گاهی</button>
-            <button class="fake-btn">تقریباً نه</button>
-            <button class="answer-btn" id="directNoBtn" data-q="2" data-answer="نه">نه</button>
+            <button onclick="shake(this)">بله، زیاد</button>
+            <button onclick="shake(this)">گاهی</button>
+            <button onclick="shake(this)">تقریباً نه</button>
+            <button onclick="directNo()">نه</button>
         </div>
 
-        <!-- صفحه معذرت‌خواهی -->
-        <div id="sorryThink" class="question">
+        <div id="sorryThink" style="display: none;">
             <h1>ببخشید سر سوال قبلی، اذیتت کردم 😔</h1>
             <p>ولی واقعاً بهم فکر می‌کردی یا نه؟</p>
-            <button class="answer-btn" data-q="2" data-answer="بله، زیاد">بله، زیاد</button>
-            <button class="answer-btn" data-q="2" data-answer="گاهی">گاهی</button>
-            <button class="answer-btn" data-q="2" data-answer="تقریباً نه">تقریباً نه</button>
-            <button class="answer-btn" data-q="2" data-answer="نه">نه</button>
+            <button onclick="goNext()">بله، زیاد</button>
+            <button onclick="goNext()">گاهی</button>
+            <button onclick="goNext()">تقریباً نه</button>
+            <button onclick="goNext()">نه</button>
         </div>
 
-        <!-- سوال ۳ -->
-        <div id="q3" class="question">
-            <h1>دلیل اصلی اینکه گفتی نمی‌خوای در ارتباط باشیم چی بود؟</h1>
-            <input type="text" id="reasonInput" placeholder="دلیلت رو بنویس...">
-            <br><br>
-            <button onclick="submitReason()">ارسال</button>
-        </div>
-
-        <!-- سوال ۴ تا ۶ و finish (کامل) -->
-        <div id="q4" class="question">
-            <h1>الان نسبت به من چه حسی داری؟</h1>
-            <button class="answer-btn" data-q="4" data-answer="هنوز دوستت دارم">هنوز دوستت دارم ❤️</button>
-            <button class="answer-btn" data-q="4" data-answer="دلتنگتم">دلتنگتم</button>
-            <button class="answer-btn" data-q="4" data-answer="گیج و بلاتکلیفم">گیج و بلاتکلیفم</button>
-            <button class="answer-btn" data-q="4" data-answer="بی‌تفاوتم">بی‌تفاوتم</button>
-            <button class="answer-btn" data-q="4" data-answer="عصبانی‌ام">عصبانی‌ام</button>
-        </div>
-
-        <div id="q5" class="question">
-            <h1>دوست داری بین ما چه رابطه‌ای باشه؟</h1>
-            <button class="answer-btn" data-q="5" data-answer="کامل فاصله بگیریم">کامل فاصله بگیریم</button>
-            <button class="answer-btn" data-q="5" data-answer="دوست بمونیم">دوست بمونیم</button>
-            <button class="answer-btn" data-q="5" data-answer="گاهی حرف بزنیم">گاهی حرف بزنیم</button>
-            <button class="answer-btn" data-q="5" data-answer="رابطه جدی">رابطه جدی</button>
-        </div>
-
-        <div id="q6" class="question">
-            <h1>آخرین سوال ❤️</h1>
-            <p>دوست داری بعد از این جواب‌ها باهم حرف بزنیم؟</p>
-            <button class="answer-btn" data-q="6" data-answer="آره">آره، دوست دارم حرف بزنیم</button>
-            <button class="answer-btn" data-q="6" data-answer="نه">نه، ترجیح می‌دم تموم بشه</button>
-        </div>
-
-        <div id="finish" class="question">
-            <h1>ممنون که جواب دادی ⭐️</h1>
-            <p>جواب‌هات ارسال شد.</p>
-            <button onclick="finishTest()">بستن</button>
-        </div>
+        <div class="debug" id="status">آماده</div>
     </div>
 
     <script>
-        let tg = null;
-        try {
-            tg = window.Telegram.WebApp;
-            if (tg) {
-                tg.expand();
-                tg.ready();
-            }
-        } catch(e) {}
-
         let answers = {};
         let hasClickedFake = false;
 
-        function hideAll() {
-            document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+        function goToQ2(answer) {
+            answers.q1 = answer;
+            document.getElementById('q1').style.display = 'none';
+            document.getElementById('q2').style.display = 'block';
+            document.getElementById('debug').textContent = 'سوال ۲ فعال شد';
         }
 
-        function showPage(id) {
-            hideAll();
-            const page = document.getElementById(id);
-            if (page) page.classList.add('active');
-        }
-
-        function shakeButton(btn) {
+        function shake(btn) {
             hasClickedFake = true;
             let i = 0;
-            const interval = setInterval(() => {
-                const x = Math.random() * 40 - 20;
-                const y = Math.random() * 30 - 15;
-                btn.style.transform = `translate(${x}px, ${y}px)`;
+            const int = setInterval(() => {
+                const x = Math.random()*30 - 15;
+                btn.style.transform = `translate(${x}px, 0)`;
                 i++;
-                if (i > 10) {
-                    clearInterval(interval);
+                if (i > 8) {
+                    clearInterval(int);
                     btn.style.transform = '';
                 }
-            }, 70);
+            }, 80);
         }
 
-        function handleDirectNo() {
+        function directNo() {
             answers.q2 = "نه";
-            showPage('sorryThink');
-            if (!hasClickedFake && tg) {
-                sendSpecialMessage(`⚠️ ستاره همون بار اول مستقیم گفت "نه"`);
+            document.getElementById('q2').style.display = 'none';
+            document.getElementById('sorryThink').style.display = 'block';
+            if (!hasClickedFake) {
+                alert("⚠️ ستاره همون بار اول مستقیم گفت \"نه\"");
             }
         }
 
-        window.submitReason = function() {
-            const reason = document.getElementById('reasonInput').value.trim() || "نداد";
-            answers.q3 = reason;
-            showPage('q4');
+        function goNext() {
+            document.getElementById('sorryThink').style.display = 'none';
+            alert("ادامه به سوال بعدی (در نسخه کامل)");
+        }
+
+        window.onload = function() {
+            document.getElementById('debug').textContent = "✅ صفحه لود شد - رنگ آبی باید ببینی";
         };
-
-        window.finishTest = function() {
-            if (tg) tg.close();
-        };
-
-        function sendToTelegram() {
-            let result = `⭐️ جواب‌های ستاره ⭐️\n\n`;
-            result += `۱. حالش: ${answers.q1 || "نامشخص"}\n`;
-            result += `۲. به من فکر کرده: ${answers.q2 || "نامشخص"}\n`;
-            result += `۳. دلیل قطع ارتباط: ${answers.q3 || "نامشخص"}\n`;
-            result += `۴. احساس فعلی: ${answers.q4 || "نامشخص"}\n`;
-            result += `۵. رابطه مورد نظر: ${answers.q5 || "نامشخص"}\n`;
-            result += `۶. نهایی: ${answers.q6 || "نامشخص"}\n`;
-
-            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
-            const chatId = "1314214026";
-
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ chat_id: chatId, text: result })
-            });
-        }
-
-        function sendSpecialMessage(text) {
-            const token = "8954970877:AAGtf-MRanTknXYG6VtdixcC-bLBXR5FE1s";
-            const chatId = "1314214026";
-            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ chat_id: chatId, text: text })
-            });
-        }
-
-        function initListeners() {
-            document.getElementById('debug').textContent = "✅ آماده شد - روی دکمه‌ها بزن";
-
-            document.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const q = parseInt(this.getAttribute('data-q'));
-                    const answer = this.getAttribute('data-answer');
-                    answers[`q${q}`] = answer;
-
-                    if (q === 1) showPage('q2');
-                    else if (q === 2) {
-                        if (this.id === 'directNoBtn') handleDirectNo();
-                        else showPage('q3');
-                    }
-                    else if (q === 4) showPage('q5');
-                    else if (q === 5) showPage('q6');
-                    else if (q === 6) {
-                        showPage('finish');
-                        sendToTelegram();
-                    }
-                });
-            });
-
-            document.querySelectorAll('.fake-btn').forEach(btn => {
-                btn.addEventListener('click', () => shakeButton(btn));
-            });
-
-            const directNoBtn = document.getElementById('directNoBtn');
-            if (directNoBtn) directNoBtn.addEventListener('click', handleDirectNo);
-        }
-
-        document.addEventListener('DOMContentLoaded', initListeners);
-        window.addEventListener('load', initListeners);
     </script>
 </body>
 </html>
